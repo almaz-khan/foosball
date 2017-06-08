@@ -1,0 +1,24 @@
+{
+  "name": "foosball",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "http://localhost:3000",
+  "dependencies": {
+    "bootstrap": "^4.0.0-alpha.6",
+    "lodash": "^4.17.4",
+    "react": "^15.5.4",
+    "react-addons-css-transition-group": "^15.5.2",
+    "react-addons-transition-group": "^15.5.2",
+    "react-dom": "^15.5.4",
+    "reactstrap": "^4.6.2",
+    "react-scripts": "1.0.7"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

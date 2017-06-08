@@ -1,0 +1,38 @@
+{
+  "name": "foosball",
+  "version": "0.0.1",
+  "description": "",
+  "engines": {
+    "node": "8.0.0",
+    "yarn": "0.24.6"
+  },
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "./buildStatic.sh",
+    "start": "node index.js",
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:almaz-khan/foosball.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.2",
+    "colors": "^1.1.2",
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "express-jwt": "^5.3.0",
+    "jsonwebtoken": "^7.4.1",
+    "lodash": "^4.17.4",
+    "method-override": "^2.3.9",
+    "mongoose": "^4.10.5",
+    "morgan": "^1.8.2"
+  },
+  "devDependencies": {
+    "chai": "^4.0.2",
+    "supertest": "^3.0.0"
+  }
+}

@@ -1,0 +1,20 @@
+.app-header {
+  background-color: #222;
+  text-align: center;
+  padding: 20px;
+  color: white;
+}
+
+.app-intro {
+  font-size: large;
+}
+
+.team-red {
+  background-color: #730505;
+  color: white;
+}
+
+.team-blue {
+  background-color: #020290;
+  color: white;
+}
