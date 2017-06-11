@@ -13,23 +13,28 @@ var GameSchema = new Schema({
 
   score: {
     blue: {
-      type: Number
+      type: Number,
+      required: true
     },
     red: {
-      type: Number
+      type: Number,
+      required: true
     }
   },
 
   participants: [{
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'user'
+      ref: 'user',
+      required: true
     },
     team: {
-      type: String
+      type: String,
+      required: true
     },
     position: {
-      type: String
+      type: String,
+      required: true
     }
   }]
 
