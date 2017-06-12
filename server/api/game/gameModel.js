@@ -3,40 +3,57 @@ var Schema = mongoose.Schema;
 
 var GameSchema = new Schema({
   startDate: {
-    type: Date,
-    required: true
+    type: Date
   },
 
   endDate: {
     type: Date
   },
 
-  score: {
-    blue: {
+  sourece: {
+    type: String
+  },
+
+  red: {
+    score: {
       type: Number,
       required: true
     },
-    red: {
-      type: Number,
+
+    offense: {
+      type: Schema.Types.ObjectId,
+      ref: 'player',
+      required: true
+    },
+
+    defense: {
+      type: Schema.Types.ObjectId,
+      ref: 'player',
       required: true
     }
   },
 
-  participants: [{
-    user: {
+  blue: {
+    score: {
+      type: Number,
+      required: true
+    },
+
+    offense: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'player',
       required: true
     },
-    team: {
-      type: String,
-      required: true
-    },
-    position: {
-      type: String,
+    defense: {
+      type: Schema.Types.ObjectId,
+      ref: 'player',
       required: true
     }
-  }]
+  },
+
+  metadata: {
+    type: Object
+  }
 
 });
 

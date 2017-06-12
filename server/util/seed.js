@@ -1,63 +1,53 @@
-var User = require('../api/user/userModel');
+var Player = require('../api/player/playerModel');
 var Game = require('../api/game/gameModel');
 var _ = require('lodash');
 var logger = require('./logger');
 
 logger.log('Seeding the Database');
 
-var users = [
-  {username: 'Jimmylo', password: 'test'},
-  {username: 'Xoko', password: 'test'},
-  {username: 'katamon', password: 'test'},
-  {username: 'Jameson', password: 'test'}
+var players = [
+  {firstName: 'Jimmylo', secondName: 'Xoko'},
+  {firstName: 'Xoko', secondName: 'Jimmylo'},
+  {firstName: 'katamon', secondName: 'Jameson'},
+  {firstName: 'Jameson', secondName: 'katamon'}
 ];
 
 var games = [{
   startDate: new Date(),
-  endDate: '',
-  score: {
-    blue: 3,
-    red: 2
+  endDate: new Date(),
+
+  red: {
+    score: 0,
+    offense: null,
+    defense: null
   },
 
-  participants: [{
-    team: 'blue',
-    position: 'defender'
-  }, {
-    team: 'blue',
-    position: 'attacker'
-  }, {
-    team: 'red',
-    position: 'attacker'
-  }, {
-    team: 'red',
-    position: 'defender'
-  }]
+  blue: {
+    score: 3,
+    offense: null,
+    defense: null
+  },
 
+  metadata: {}
 }, {
-
   startDate: new Date(),
-  endDate: '',
-  score: {
-    blue: 0,
-    red: 3
+  endDate: new Date(),
+
+  red: {
+    score: 3,
+    offense: null,
+    defense: null
   },
 
-  participants: [{
-      team: 'blue',
-      position: 'attacker'
-    }, {
-    team: 'blue',
-    position: 'defender'
-  }, {
-    team: 'red',
-    position: 'attacker'
-  }, {
-    team: 'red',
-    position: 'defender'
-  }]
+  blue: {
+    score: 2,
+    offense: null,
+    defense: null
+  },
 
-}];
+  metadata: {}
+}]
+
 
 var createDoc = function(model, doc) {
   return new Promise(function(resolve, reject) {
@@ -69,30 +59,32 @@ var createDoc = function(model, doc) {
 
 var cleanDB = function() {
   logger.log('... cleaning the DB');
-  var cleanPromises = [User, Game]
+  var cleanPromises = [Player, Game]
     .map(function(model) {
       return model.remove().exec();
     });
   return Promise.all(cleanPromises);
 }
 
-var createUsers = function(data) {
+var createPlayers = function(data) {
 
-  var promises = users.map(function(user) {
-    return createDoc(User, user);
+  var promises = players.map(function(player) {
+    return createDoc(Player, player);
   });
 
   return Promise.all(promises)
-    .then(function(users) {
-      return _.merge({users: users}, data || {});
+    .then(function(players) {
+      return _.merge({players: players}, data || {});
     });
 };
 
 var createGames = function(data) {
   var newGames = games.map(function(game, i) {
-    game.participants = game.participants.map(participant => {
-      return _.merge(participant, {user: data.users[i]._id})
-    })
+    game.blue.offense = data.players[0]._id
+    game.blue.defense = data.players[1]._id
+    game.red.offense = data.players[2]._id
+    game.red.defense = data.players[3]._id
+
     return createDoc(Game, game);
   });
 
@@ -101,13 +93,13 @@ var createGames = function(data) {
       return _.merge({games: games}, data || {});
     })
     .then(function() {
-      return 'Seeded DB with 4 Users, 2 Games';
+      return 'Seeded DB with 4 Players, 2 Games';
     })
     .catch(error => console.log(error));
 };
 
 cleanDB()
-  .then(createUsers)
+  .then(createPlayers)
   .then(createGames)
   .then(logger.log.bind(logger))
   .catch(logger.log.bind(logger));

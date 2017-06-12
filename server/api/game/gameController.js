@@ -4,7 +4,7 @@ var logger = require('../../util/logger');
 
 exports.params = function(req, res, next, id) {
   Game.findById(id)
-    .populate('team', 'username')
+    .populate('red.offense red.defense blue.offense blue.defense')
     .exec()
     .then(function(game) {
       if (!game) {
@@ -20,7 +20,7 @@ exports.params = function(req, res, next, id) {
 
 exports.get = function(req, res, next) {
   Game.find({})
-    .populate({path: 'redTeam.team blueTeam.team', populate: {path: 'defensePlayer attackPlayer', select: '-password'}})
+    .populate({path: 'red.offense red.defense blue.offense blue.defense'})
     .exec()
     .then(function(games){
       res.json(games);
@@ -52,7 +52,6 @@ exports.put = function(req, res, next) {
 
 exports.post = function(req, res, next) {
   var newgame = req.body;
-  newgame.author = req.user._id;
 
   Game.create(newgame)
     .then(function(game) {
