@@ -45,7 +45,7 @@ class Team extends Component {
               user: player._id
             }, {
               team: this.props.team,
-              position: 'attaker',
+              position: 'attacker',
               user: this.state.attacker._id
             }])
           }
@@ -53,7 +53,7 @@ class Team extends Component {
           return <DropdownItem
             onClick={setDefensePlayer}
             key={player._id}
-          >{player.username}</DropdownItem>
+          >{player.secondName}</DropdownItem>
         })}
       </DropdownMenu>
     )
@@ -77,7 +77,7 @@ class Team extends Component {
               user: this.state.defense._id
             }, {
               team: this.props.team,
-              position: 'attaker',
+              position: 'attacker',
               user: player._id
             }])
           }
@@ -85,7 +85,7 @@ class Team extends Component {
           return <DropdownItem
             onClick={setAtackPlayer.bind(this)}
             key={player._id}
-          >{player.username}</DropdownItem>
+          >{player.secondName}</DropdownItem>
           })}
       </DropdownMenu>
     )
@@ -106,7 +106,7 @@ class Team extends Component {
             <td>
               <Dropdown isOpen={this.state.defenseOpen} toggle={this.toggleDefense}>
                 <DropdownToggle caret>
-                  {this.state.defense.username || 'Dropdown'}
+                  {this.state.defense.secondName || 'Dropdown'}
                 </DropdownToggle>
                 {this.getDefensePlayers()}
               </Dropdown>
@@ -115,7 +115,7 @@ class Team extends Component {
             <td>
               <Dropdown isOpen={this.state.atackOpen} toggle={this.toggleAtack}>
                 <DropdownToggle caret>
-                  {this.state.attacker.username || 'Dropdown'}
+                  {this.state.attacker.secondName || 'Dropdown'}
                 </DropdownToggle>
                 {this.getAttackPlayers()}
               </Dropdown>

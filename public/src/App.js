@@ -24,15 +24,23 @@ class App extends Component {
   }
 
   saveGame() {
-    const game = {
-        startDate: this.state.startDate,
-        endDate: new Date(),
-        score: {
-          red: this.state.redTeamScore,
-          blue: this.state.blueTeamScore
-        },
+    const bluePlayers = this.state.participants.filter(p => p.team === 'blue')
+    const redPlayers = this.state.participants.filter(p => p.team === 'red')
 
-        participants: this.state.participants
+    const game = {
+      startDate: this.state.startDate,
+      endDate: new Date(),
+      red:{
+        score: this.state.redTeamScore,
+        defense: redPlayers.find(player => player.position === 'defense').user,
+        offense: redPlayers.find(player => player.position === 'attacker').user
+      },
+
+      blue: {
+        score: this.state.blueTeamScore,
+        defense: bluePlayers.find(player => player.position === 'defense').user,
+        offense: bluePlayers.find(player => player.position === 'attacker').user
+      }
     }
     const token = localStorage.getItem('token') || ''
 
@@ -67,12 +75,12 @@ class App extends Component {
   }
 
   getUsers() {
-    fetch('/api/users/')
+    fetch('/api/players/')
       .then(res => {
         return res.json()
       })
-      .then(users => {
-        this.setState({users: users})
+      .then(players => {
+        this.setState({users: players})
       })
       .catch(err => console.error(err))
   }
