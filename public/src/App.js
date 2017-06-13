@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import Team from './Team'
+//import Team from './Team'
 import { Alert, InputGroupAddon, InputGroup, Collapse, Form, FormGroup, Input, Button } from 'reactstrap';
 
 class App extends Component {
@@ -11,11 +11,15 @@ class App extends Component {
       users: [],
       startDate: '',
       endDate: '',
-      redTeamScore: '',
-      blueTeamScore: '',
+      redTeamScore: 0,
+      blueTeamScore: 0,
       participants: [],
       alertType: '',
-      alertMessage: ''
+      alertMessage: '',
+      blueDefense: '',
+      blueOffense: '',
+      redDefense: '',
+      redOffense: ''
     }
   }
 
@@ -24,22 +28,19 @@ class App extends Component {
   }
 
   saveGame() {
-    const bluePlayers = this.state.participants.filter(p => p.team === 'blue')
-    const redPlayers = this.state.participants.filter(p => p.team === 'red')
-
     const game = {
       startDate: this.state.startDate,
       endDate: new Date(),
       red:{
         score: this.state.redTeamScore,
-        defense: redPlayers.find(player => player.position === 'defense').user,
-        offense: redPlayers.find(player => player.position === 'attacker').user
+        defense: this.state.redDefense,
+        offense: this.state.redOffense
       },
 
       blue: {
         score: this.state.blueTeamScore,
-        defense: bluePlayers.find(player => player.position === 'defense').user,
-        offense: bluePlayers.find(player => player.position === 'attacker').user
+        defense: this.state.blueDefense,
+        offense: this.state.blueOffense
       }
     }
     const token = localStorage.getItem('token') || ''
@@ -57,8 +58,8 @@ class App extends Component {
         this.setState({
           startDate: '',
           endDate: '',
-          redTeamScore: '',
-          blueTeamScore: ''
+          redTeamScore: 0,
+          blueTeamScore: 0
         });
         this.setState({
           alertType: 'success',
@@ -139,14 +140,19 @@ class App extends Component {
     return
   }
 
-  setParticipants(participants) {
-    const oldParticipants = this.state.participants.filter(item => item.team !== participants[0].team)
+  setParticipants(player) {
+    const playersList = [
+      'redDefense',
+      'redOffense',
+      'blueDefense',
+      'blueOffense',
+    ]
+    let unsettedPlayers = playersList.find(player => {
+      return !this.state[player]
+    })
 
     this.setState({
-      participants: [
-        ...oldParticipants,
-        ...participants
-      ]
+      [unsettedPlayers]: player
     })
   }
 
@@ -182,14 +188,49 @@ class App extends Component {
     })
   }
 
+  showPlayers() {
+    const playersList = [
+      'redDefense',
+      'redOffense',
+      'blueDefense',
+      'blueOffense'
+    ]
+    let settedPlayers = []
+    playersList.forEach(player => {
+      if (this.state[player]) {
+        settedPlayers.push(this.state[player])
+      }
+    })
+
+    const players = this.state.users.filter(user => {
+      return settedPlayers.findIndex(settedP => settedP._id === user._id) <= -1
+    })
+
+    return players.map(player => {
+      const setPlayer = () => {
+        this.setParticipants(player)
+      }
+      return <div className="player" key={player._id} onClick={setPlayer.bind(this)} >{player.firstName} {player.secondName}</div>
+    })
+  }
+
+  addBlueScore() {
+  this.setState({
+      blueTeamScore: this.state.blueTeamScore + 1
+    })
+  }
+
+  addRedScore() {
+    this.setState({
+      redTeamScore: this.state.redTeamScore + 1
+    })
+  }
+
   render() {
 
     return (
       <div className="app">
         <div className="app-header">
-          <div className="login-button">
-            <Button color="primary" onClick={this.toggleLogin.bind(this)}>Log in</Button>
-          </div>
 
           <div className="alert-message">
             <Alert color={this.state.alertType || 'success'} isOpen={this.state.alertMessage} toggle={this.onDismiss.bind(this)}>
@@ -214,20 +255,27 @@ class App extends Component {
 
         <div className="content">
           <div className="team-red">
-            <Team users={this.state.users} team="red" setParticipants={this.setParticipants.bind(this)} />
+            <div className="defense">Defense: {this.state.redDefense.firstName} {this.state.redDefense.secondName}</div>
+            <div className="offense">Offense: {this.state.redOffense.firstName} {this.state.redOffense.secondName}</div>
             <InputGroup>
               <InputGroupAddon>Red Team score</InputGroupAddon>
               <Input type="number" value={this.state.redTeamScore} onChange={this.setRedTeamScore.bind(this)} />
+              <Button color="primary" onClick={this.addRedScore.bind(this)}>+</Button>
             </InputGroup>
           </div>
           <div className="team-blue">
-            <Team users={this.state.users} team="blue"  setParticipants={this.setParticipants.bind(this)}/>
+            <div className="defense">Defense: {this.state.blueDefense.firstName} {this.state.blueDefense.secondName}</div>
+            <div className="offense">Offense: {this.state.blueOffense.firstName} {this.state.blueOffense.secondName}</div>
             <InputGroup>
               <InputGroupAddon>Blue Team score</InputGroupAddon>
               <Input type="number" value={this.state.blueTeamScore} onChange={this.setBlueTeamScore.bind(this)}/>
+              <Button color="primary" onClick={this.addBlueScore.bind(this)}>+</Button>
             </InputGroup>
           </div>
 
+          <div className="players">
+            {this.showPlayers()}
+          </div>
           <div className="buttons-container">
             {this.showButton()}
           </div>
