@@ -31,6 +31,7 @@ class App extends Component {
     const game = {
       startDate: this.state.startDate,
       endDate: new Date(),
+      source: 'reactApp',
       red:{
         score: this.state.redTeamScore,
         defense: this.state.redDefense,
