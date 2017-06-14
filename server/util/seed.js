@@ -15,6 +15,7 @@ var players = [
 var games = [{
   startDate: new Date(),
   endDate: new Date(),
+  source: 'test',
 
   red: {
     score: 0,
@@ -32,6 +33,7 @@ var games = [{
 }, {
   startDate: new Date(),
   endDate: new Date(),
+  source: 'test1',
 
   red: {
     score: 3,

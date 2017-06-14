@@ -19,7 +19,8 @@ exports.params = function(req, res, next, id) {
 };
 
 exports.get = function(req, res, next) {
-  Game.find({})
+  const query = req.query ? req.query : {}
+  Game.find(query)
     .populate({path: 'red.offense red.defense blue.offense blue.defense'})
     .exec()
     .then(function(games){
