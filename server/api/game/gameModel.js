@@ -10,7 +10,7 @@ var GameSchema = new Schema({
     type: Date
   },
 
-  sourece: {
+  source: {
     type: String
   },
 
