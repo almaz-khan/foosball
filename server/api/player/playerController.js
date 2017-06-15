@@ -40,7 +40,7 @@ exports.put = function(req, res, next) {
     if (err) {
       next(err);
     } else {
-      res.json(saved.toJson());
+      res.json(saved);
     }
   })
 };

@@ -6,10 +6,10 @@ var logger = require('./logger');
 logger.log('Seeding the Database');
 
 var players = [
-  {firstName: 'Jimmylo', secondName: 'Xoko'},
-  {firstName: 'Xoko', secondName: 'Jimmylo'},
-  {firstName: 'katamon', secondName: 'Jameson'},
-  {firstName: 'Jameson', secondName: 'katamon'}
+  {firstName: 'Jimmylo', lastName: 'Xoko'},
+  {firstName: 'Xoko', lastName: 'Jimmylo'},
+  {firstName: 'katamon', lastName: 'Jameson'},
+  {firstName: 'Jameson', lastName: 'katamon'}
 ];
 
 var games = [{

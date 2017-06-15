@@ -4,15 +4,12 @@ var Schema = mongoose.Schema;
 var PlayerSchema = new Schema({
   firstName: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
 
-  secondName: {
-    type: String,
-    required: true,
-    unique: true
-  },
+  lastName: {
+    type: String
+  }
 });
 
 module.exports = mongoose.model('player', PlayerSchema);
