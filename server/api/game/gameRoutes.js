@@ -69,11 +69,107 @@ router.route('/')
 
   .get(controller.get)
 
+/**
+ * @swagger
+ * /api/games:
+ *   post:
+ *     summary: Add Game
+ *     description: Add game
+ *     tags: [Games]
+ *     parameters:
+ *     - in: "body"
+ *       name: "body"
+ *       description: "Game obj"
+ *       required: true
+ *       schema:
+ *         $ref: "#/definitions/Games"
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success add game
+ */
+
   .post(controller.post)
 
 router.route('/:id')
+
+/**
+ * @swagger
+ * /api/games/{id}:
+ *   get:
+ *     summary: Get Game
+ *     description: Get game by id
+ *     tags: [Games]
+ *     parameters:
+ *       - name: id
+ *         description: Game's id
+ *         in: path
+ *         type: string
+ *         required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success get game by id
+ *       400:
+ *         description: Can't find game by id
+ */
+
   .get(controller.getOne)
+
+/**
+ * @swagger
+ * /api/game/{id}:
+ *   put:
+ *     summary: Update Game
+ *     description: Update game by id
+ *     tags: [Games]
+ *     parameters:
+ *       - name: id
+ *         description: Game's id
+ *         in: path
+ *         type: string
+ *         required: true
+ *       - in: "body"
+ *         name: "body"
+ *         description: "Game obj"
+ *         required: true
+ *         schema:
+ *           $ref: "#/definitions/Games"
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success update game
+ *       400:
+ *         description: Can't find game by id
+ */
+
   .put(controller.put)
+
+/**
+ * @swagger
+ * /api/game/{id}:
+ *   delete:
+ *     summary: Delete Game
+ *     description: Delete game by id
+ *     tags: [Games]
+ *     parameters:
+ *       - name: id
+ *         description: Game's id
+ *         in: path
+ *         type: string
+ *         required: true
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success delete game
+ *       400:
+ *         description: Can't find game by id
+ */
+
   .delete(controller.delete)
 
 module.exports = router;
