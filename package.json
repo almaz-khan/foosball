@@ -29,7 +29,9 @@
     "lodash": "^4.17.4",
     "method-override": "^2.3.9",
     "mongoose": "^4.10.5",
-    "morgan": "^1.8.2"
+    "morgan": "^1.8.2",
+    "swagger-jsdoc": "^1.9.4",
+    "swagger-ui-express": "^2.0.0"
   },
   "devDependencies": {
     "chai": "^4.0.2",

@@ -4,6 +4,7 @@ var api = require('./api/api');
 var config = require('./config/config');
 var logger = require('./util/logger');
 var auth = require('./auth/routes');
+var swagger = require('./swagger');
 var path = require('path');
 // db.url is different depending on NODE_ENV
 require('mongoose').connect(config.db.url);
@@ -17,12 +18,14 @@ require('./middleware/appMiddlware')(app);
 // setup the api
 app.use('/api', api);
 app.use('/auth', auth);
+app.use('/swagger', swagger);
 app.use('/', express.static(path.join(__dirname, '../public/build')))
+
 app.get('/',function(req,res){
   res.sendFile(__dirname + '../public/build/index.html');
 });
-// set up global error handling
 
+// set up global error handling
 app.use(function(err, req, res, next) {
   // if error thrown from jwt validation check
   if (err.name === 'UnauthorizedError') {

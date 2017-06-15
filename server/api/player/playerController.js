@@ -60,7 +60,7 @@ exports.delete = function(req, res, next) {
     if (err) {
       next(err);
     } else {
-      res.json(removed.toJson());
+      res.json(removed);
     }
   });
 };
