@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-var GameSchema = new Schema({
+const GameSchema = new Schema({
   startDate: {
     type: Date
   },
@@ -55,6 +55,6 @@ var GameSchema = new Schema({
     type: Object
   }
 
-});
+})
 
-module.exports = mongoose.model('game', GameSchema);
+module.exports = mongoose.model('game', GameSchema)

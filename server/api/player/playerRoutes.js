@@ -1,10 +1,10 @@
-var router = require('express').Router();
-var logger = require('../../util/logger');
-var controller = require('./playerController');
+const router = require('express').Router()
+const logger = require('../../util/logger')
+const controller = require('./playerController')
 
 // setup boilerplate route jsut to satisfy a request
 // for building
-router.param('id', controller.params);
+router.param('id', controller.params)
 router.route('/')
 
 /**
@@ -14,6 +14,8 @@ router.route('/')
  *     required:
  *       - firstName
  *     properties:
+ *       _id:
+ *         type: string
  *       firstName:
  *         type: string
  *       lastName:
@@ -149,4 +151,4 @@ router.route('/:id')
 
   .delete(controller.delete)
 
-module.exports = router;
+module.exports = router
