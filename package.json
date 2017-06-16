@@ -3,12 +3,10 @@
   "version": "0.0.1",
   "description": "",
   "engines": {
-    "node": "8.0.0",
-    "yarn": "0.24.6"
+    "node": "8.0.0"
   },
   "main": "index.js",
   "scripts": {
-    "postinstall": "./buildStatic.sh",
     "start": "node index.js",
     "test": ""
   },
