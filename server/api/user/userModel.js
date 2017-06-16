@@ -1,8 +1,8 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var bcrypt = require('bcrypt');
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+const bcrypt = require('bcrypt')
 
-var UserSchema = new Schema({
+const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
@@ -14,37 +14,37 @@ var UserSchema = new Schema({
     type: String,
     required: true
   }
-});
+})
 
 UserSchema.pre('save', function(next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return next()
 
 
-  this.password = this.encryptPassword(this.password);
-  next();
+  this.password = this.encryptPassword(this.password)
+  next()
 })
 
 UserSchema.methods = {
   // check the passwords on signin
   authenticate: function(plainTextPword) {
-    return bcrypt.compareSync(plainTextPword, this.password);
+    return bcrypt.compareSync(plainTextPword, this.password)
   },
   // hash the passwords
   encryptPassword: function(plainTextPword) {
     if (!plainTextPword) {
       return ''
     } else {
-      var salt = bcrypt.genSaltSync(10);
-      return bcrypt.hashSync(plainTextPword, salt);
+      const salt = bcrypt.genSaltSync(10)
+      return bcrypt.hashSync(plainTextPword, salt)
     }
   },
 
   toJson: function() {
-    var obj = this.toObject()
-    delete obj.password;
-    return obj;
+    const obj = this.toObject()
+    delete obj.password
+    return obj
   }
-};
+}
 
 
-module.exports = mongoose.model('user', UserSchema);
+module.exports = mongoose.model('user', UserSchema)

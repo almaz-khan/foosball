@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-var PlayerSchema = new Schema({
+const PlayerSchema = new Schema({
   firstName: {
     type: String,
     required: true
@@ -10,6 +10,6 @@ var PlayerSchema = new Schema({
   lastName: {
     type: String
   }
-});
+})
 
-module.exports = mongoose.model('player', PlayerSchema);
+module.exports = mongoose.model('player', PlayerSchema)

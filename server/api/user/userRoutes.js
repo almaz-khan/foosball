@@ -1,13 +1,13 @@
-var router = require('express').Router();
-var logger = require('../../util/logger');
-var controller = require('./userController');
-var auth = require('../../auth/auth');
-var checkUser = [auth.decodeToken(), auth.getFreshUser()];
+const router = require('express').Router()
+const logger = require('../../util/logger')
+const controller = require('./userController')
+const auth = require('../../auth/auth')
+const checkUser = [auth.decodeToken(), auth.getFreshUser()]
 
 // setup boilerplate route jsut to satisfy a request
 // for building
-router.param('id', controller.params);
-router.get('/me', checkUser, controller.me);
+router.param('id', controller.params)
+router.get('/me', checkUser, controller.me)
 
 router.route('/')
   .get(controller.get)
@@ -18,4 +18,4 @@ router.route('/:id')
   .put(checkUser, controller.put)
   .delete(checkUser, controller.delete)
 
-module.exports = router;
+module.exports = router

@@ -1,11 +1,11 @@
-var router = require('express').Router();
-var controller = require('./gameController');
-var auth = require('../../auth/auth');
+const router = require('express').Router()
+const controller = require('./gameController')
+const auth = require('../../auth/auth')
 
-var checkUser = [auth.decodeToken(), auth.getFreshUser()];
+const checkUser = [auth.decodeToken(), auth.getFreshUser()]
 // setup boilerplate route jsut to satisfy a request
 // for building
-router.param('id', controller.params);
+router.param('id', controller.params)
 
 router.route('/')
 
@@ -20,9 +20,9 @@ router.route('/')
  *       - blue/defense
  *     properties:
  *       startDate:
- *         type: string
+ *         type: date
  *       endDate:
- *         type: string
+ *         type: date
  *       source:
  *         type: string
  *       metadata:
@@ -60,6 +60,12 @@ router.route('/')
  *     summary: Get Games
  *     description: Get All Games
  *     tags: [Games]
+ *     parameters:
+ *       - in: query
+ *         name: source
+ *         type: string
+ *         required: false
+ *         description: Filter games by source
  *     produces:
  *       - application/json
  *     responses:
@@ -172,4 +178,4 @@ router.route('/:id')
 
   .delete(controller.delete)
 
-module.exports = router;
+module.exports = router
