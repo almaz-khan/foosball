@@ -25,8 +25,8 @@ exports.get = function(req, res, next) {
 }
 
 exports.getOne = function(req, res, next) {
-  const player = req.player.toJson()
-  res.json(player.toJson())
+  const player = req.player
+  res.json(player)
 }
 
 exports.put = function(req, res, next) {

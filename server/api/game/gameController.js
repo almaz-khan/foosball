@@ -3,6 +3,8 @@ const _ = require('lodash')
 const logger = require('../../util/logger')
 
 exports.params = function(req, res, next, id) {
+
+  console.log(id)
   Game.findById(id)
     .populate('red.offense red.defense blue.offense blue.defense')
     .exec()
@@ -41,6 +43,8 @@ exports.put = function(req, res, next) {
   const update = req.body
 
   _.merge(game, update)
+
+  console.log(update)
 
   game.save(function(err, saved) {
     if (err) {

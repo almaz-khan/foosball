@@ -126,7 +126,7 @@ router.route('/:id')
 
 /**
  * @swagger
- * /api/game/{id}:
+ * /api/games/{id}:
  *   put:
  *     summary: Update Game
  *     description: Update game by id
@@ -156,7 +156,7 @@ router.route('/:id')
 
 /**
  * @swagger
- * /api/game/{id}:
+ * /api/games/{id}:
  *   delete:
  *     summary: Delete Game
  *     description: Delete game by id

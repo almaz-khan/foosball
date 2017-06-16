@@ -19,11 +19,6 @@ require('./middleware/appMiddlware')(app)
 app.use('/api', api)
 app.use('/auth', auth)
 app.use('/swagger', swagger)
-app.use('/', express.static(path.join(__dirname, '../public/build')))
-
-app.get('/',function(req,res){
-  res.sendFile(__dirname + '../public/build/index.html')
-})
 
 // set up global error handling
 app.use(function(err, req, res, next) {
