@@ -4,7 +4,6 @@ const logger = require('../../util/logger')
 
 exports.params = function(req, res, next, id) {
 
-  console.log(id)
   Game.findById(id)
     .populate('red.offense red.defense blue.offense blue.defense')
     .exec()
@@ -44,8 +43,6 @@ exports.put = function(req, res, next) {
 
   _.merge(game, update)
 
-  console.log(update)
-
   game.save(function(err, saved) {
     if (err) {
       next(err)
@@ -58,9 +55,13 @@ exports.put = function(req, res, next) {
 exports.post = function(req, res, next) {
   const newgame = req.body
 
+  delete newgame._id
+
   Game.create(newgame)
     .then(function(game) {
-      res.json(game)
+      Game.populate(game, {
+        path: 'red.offense red.defense blue.offense blue.defense'
+      }, (err, gameWhithPlayers) => res.json(gameWhithPlayers))
     }, function(err) {
       logger.error(err)
       next(err)

@@ -46,6 +46,7 @@ exports.put = function(req, res, next) {
 }
 
 exports.post = function(req, res, next) {
+  delete req.body._id
   const newPlayer = new Player(req.body)
 
   newPlayer.save(function(err, player) {
