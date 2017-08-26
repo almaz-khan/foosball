@@ -1,6 +1,8 @@
 const Game = require('./gameModel')
 const _ = require('lodash')
 const logger = require('../../util/logger')
+const flatten = require('../../util/flatten')
+const csv = require('csv-express')
 
 exports.params = function(req, res, next, id) {
 
@@ -20,12 +22,30 @@ exports.params = function(req, res, next, id) {
 }
 
 exports.get = function(req, res, next) {
-  const query = req.query ? req.query : {}
+  const query = req.query && req.query.source ? {source: req.query.source} : {}
+
   Game.find(query)
     .populate({path: 'red.offense red.defense blue.offense blue.defense'})
     .exec()
     .then(function(games){
-      res.json(games)
+
+      if (req.query.csv) {
+        const flatGames = games.map(item => {
+          const objItem = item.toObject({
+            transform: (doc, ret, options) => {
+              delete ret._id
+              return ret
+            },
+            versionKey: false
+          })
+
+          return flatten(objItem)
+        })
+
+        res.csv(flatGames, true)
+      } else {
+        res.json(games)
+      }
     }, function(err){
       next(err)
     })
