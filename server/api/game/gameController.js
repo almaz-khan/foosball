@@ -51,10 +51,6 @@ exports.get = function(req, res, next) {
     })
 }
 
-exports.getCsv = function(req, res, next) {
-  res.json(game)
-}
-
 exports.getOne = function(req, res, next) {
   const game = req.game
   res.json(game)
