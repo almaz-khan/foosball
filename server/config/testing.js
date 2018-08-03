@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // disbable logging for testing
   logging: false,
   db: {

@@ -1,4 +1,4 @@
-const flatten = (object, separator = '.') => {
+export const flatten = (object, separator = '.') => {
 
   const isValidObject = value => {
     if (!value) {
@@ -22,5 +22,3 @@ const flatten = (object, separator = '.') => {
 
   return Object.assign({}, walker(object))
 }
-
-module.exports = flatten

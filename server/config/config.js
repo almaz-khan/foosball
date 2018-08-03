@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import _ from 'lodash'
 
 const config = {
   dev: 'development',
@@ -37,4 +37,4 @@ try {
 // merge the two config files together
 // the envConfig file will overwrite properties
 // on the config object
-module.exports = _.merge(config, envConfig)
+export default _.merge(config, envConfig)

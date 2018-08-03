@@ -5,11 +5,11 @@
 // automatically require the index.js on the root
 
 // setup config first before anything by requiring it
-const config = require('./server/config/config')
-const app = require('./server/server')
-const logger = require('./server/util/logger')
+import config from './server/config/config'
+import app from './server/server'
+// import logger from './server/util/logger'
 
 app.listen(config.port)
-logger.log('listening on http://localhost:' + config.port)
+// logger.log('listening on http://localhost:' + config.port)
 
 

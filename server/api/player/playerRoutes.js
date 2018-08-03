@@ -1,10 +1,10 @@
-const router = require('express').Router()
-const logger = require('../../util/logger')
-const controller = require('./playerController')
+import express from 'express'
+import { params, get, getOne, post, put, remove } from './playerController'
+const router = express.Router()
 
 // setup boilerplate route jsut to satisfy a request
 // for building
-router.param('id', controller.params)
+router.param('id', params)
 router.route('/')
 
 /**
@@ -43,7 +43,7 @@ router.route('/')
  *         description: Success get all players
  */
 
-  .get(controller.get)
+  .get(get)
 
 /**
  * @swagger
@@ -68,7 +68,7 @@ router.route('/')
  *       200:
  *         description: Success add player
  */
-  .post(controller.post)
+  .post(post)
 
 router.route('/:id')
 /**
@@ -93,7 +93,7 @@ router.route('/:id')
  *         description: Can't find player by id
  */
 
-  .get(controller.getOne)
+  .get(getOne)
 
 /**
  * @swagger
@@ -125,7 +125,7 @@ router.route('/:id')
  *         description: Can't find player by id
  */
 
-  .put(controller.put)
+  .put(put)
 
 /**
  * @swagger
@@ -149,6 +149,6 @@ router.route('/:id')
  *         description: Can't find player by id
  */
 
-  .delete(controller.delete)
+  .delete(remove)
 
-module.exports = router
+export default router

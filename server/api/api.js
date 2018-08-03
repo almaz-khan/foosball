@@ -1,8 +1,10 @@
-const router = require('express').Router()
+import express from 'express'
+import playerRoutes from './player/playerRoutes'
+const router = express.Router()
 
 // api router will mount other routers
 // for all our resources
-router.use('/players', require('./player/playerRoutes'))
-router.use('/games', require('./game/gameRoutes'))
+router.use('/players', playerRoutes)
+// router.use('/games', require('./game/gameRoutes'))
 
-module.exports = router
+export default router

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const PlayerSchema = new Schema({
@@ -12,4 +12,4 @@ const PlayerSchema = new Schema({
   }
 })
 
-module.exports = mongoose.model('player', PlayerSchema)
+export default mongoose.model('player', PlayerSchema)

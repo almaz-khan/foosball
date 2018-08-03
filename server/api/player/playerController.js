@@ -1,67 +1,26 @@
-const Player = require('./playerModel')
-const _ = require('lodash')
+import Player from './playerModel'
+import _ from 'lodash'
 
-exports.params = function(req, res, next, id) {
-  Player.findById(id)
-    .then(function(player) {
-      if (!player) {
-        next(new Error('No player with that id'))
-      } else {
-        req.player = player
-        next()
-      }
-    }, function(err) {
-      next(err)
-    })
+export function params(req, res, next, id) {
+  console.log('params')
 }
 
-exports.get = function(req, res, next) {
-  Player.find({})
-    .then(function(players){
-      res.json(players)
-    }, function(err){
-      next(err)
-    })
+export function get(req, res, next) {
+  console.log('params')
 }
 
-exports.getOne = function(req, res, next) {
-  const player = req.player
-  res.json(player)
+export function getOne(req, res, next) {
+  console.log('params')
 }
 
-exports.put = function(req, res, next) {
-  const player = req.player
-
-  const update = req.body
-
-  _.merge(player, update)
-
-  player.save(function(err, saved) {
-    if (err) {
-      next(err)
-    } else {
-      res.json(saved)
-    }
-  })
+export function put(req, res, next) {
+  console.log('params')
 }
 
-exports.post = function(req, res, next) {
-  delete req.body._id
-  const newPlayer = new Player(req.body)
-
-  newPlayer.save(function(err, player) {
-    if(err) { return next(err)}
-
-    res.json(player)
-  })
+export function post(req, res, next) {
+  console.log('params')
 }
 
-exports.delete = function(req, res, next) {
-  req.player.remove(function(err, removed) {
-    if (err) {
-      next(err)
-    } else {
-      res.json(removed)
-    }
-  })
+export function remove(req, res, next) {
+  console.log('params')
 }
