@@ -29,7 +29,7 @@ try {
   envConfig = require('./' + config.env)
   // just making sure the require actually
   // got something back :)
-  envConfig = envConfig || {}
+  envConfig = envConfig.default || {}
 } catch(e) {
   envConfig = {}
 }
