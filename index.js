@@ -11,5 +11,3 @@ import app from './server/server'
 
 app.listen(config.port)
 // logger.log('listening on http://localhost:' + config.port)
-
-
