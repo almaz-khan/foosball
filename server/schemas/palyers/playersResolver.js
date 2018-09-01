@@ -1,4 +1,5 @@
 import Player from './playerModel'
+import Game from '../games/gameModel'
 
 export const playersResolvers = {
   Query: {
@@ -22,6 +23,23 @@ export const playersResolvers = {
       const resp = await Player.findById(_id).remove()
 
       return resp.n ? _id : 'Cannot be removed';
+    }
+  },
+  Player: {
+    async games(player) {
+      return await Game
+        .find()
+        .or([{
+          'red.offense': player._id
+        }, {
+          'red.defense': player._id
+        }, {
+          'blue.offense': player._id
+        }, {
+          'blue.defense': player._id
+        }])
+        .populate('red.offense red.defense blue.offense blue.defense')
+        .exec()
     }
   }
 }

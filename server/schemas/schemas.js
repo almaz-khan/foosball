@@ -1,40 +1,31 @@
-import Players from './palyers/playersSchemas'
-import Games from './games/gamesSchemas'
+import { playerSchema } from './palyers/playersSchemas'
+import { gameSchema } from './games/gamesSchemas'
+import { userSchema } from './users/userSchemas'
 import { playersResolvers } from './palyers/playersResolver'
 import { gamesResolvers } from './games/gamesResolver'
+import { usersResolvers } from './users/userResolver'
+import { mergeSchemas } from 'graphql-tools'
 
-import { makeExecutableSchema } from 'graphql-tools'
-
-const RootQuery = `
-  type Query {
-    players: [Player]
-    player(_id: String): Player
-    games: [Game]
+const linkTypeDefs = `
+  extend type Player {
+    games: [Game!]
   }
-  type Mutation {
-    addPlayer(input: PlayerInput): Player
-    updatePlayer(_id: String, input: PlayerInput): String
-    removePlayer(_id: String): String
-    addGame(input: GameInput): Game
+  extend type Team {
+    offense: Player,
+    defense: Player
   }
-`;
+`
 
-const SchemaDefinition = `
-  schema {
-    query: Query
-    mutation: Mutation
-  }
-`;
-
-export const schema = makeExecutableSchema({
-  typeDefs: [
-    RootQuery,
-    SchemaDefinition,
-    Players,
-    Games
+export const schema = mergeSchemas({
+  schemas: [
+    playerSchema,
+    userSchema,
+    gameSchema,
+    linkTypeDefs
   ],
   resolvers: [
     playersResolvers,
-    gamesResolvers
+    gamesResolvers,
+    usersResolvers
   ]
 });
