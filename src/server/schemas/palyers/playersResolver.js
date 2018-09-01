@@ -2,6 +2,7 @@ import { combineResolvers } from 'graphql-resolvers';
 import Player from './playerModel'
 import Game from '../games/gameModel'
 import { isAuthenticated } from '../authorization/authorizationResolver';
+import '@babel/polyfill'
 
 export const playersResolvers = {
   Query: {
