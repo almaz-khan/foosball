@@ -4,5 +4,6 @@ export default {
   seed: true,
   db: {
     url: 'mongodb://localhost/nodeblog'
-  }
+  },
+  secret: 'test'
 }

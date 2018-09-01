@@ -1,4 +1,7 @@
 import Game from './gameModel'
+import { combineResolvers } from 'graphql-resolvers';
+
+import { isAuthenticated } from '../authorization/authorizationResolver';
 
 export const gamesResolvers = {
   Query: {
@@ -10,8 +13,11 @@ export const gamesResolvers = {
     }
   },
   Mutation: {
-    async addGame(_, {input}) {
-      return await Game.create(input)
-    }
+    addGame: combineResolvers(
+      isAuthenticated,
+      async (_, {input}) => {
+        return await Game.create(input)
+      }
+    )
   }
 }

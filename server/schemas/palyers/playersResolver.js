@@ -1,5 +1,8 @@
+import { combineResolvers } from 'graphql-resolvers';
+
 import Player from './playerModel'
 import Game from '../games/gameModel'
+import { isAuthenticated } from '../authorization/authorizationResolver';
 
 export const playersResolvers = {
   Query: {
@@ -11,19 +14,28 @@ export const playersResolvers = {
     }
   },
   Mutation: {
-    async addPlayer(_, { input }) {
-      return await Player.create(input)
-    },
-    async updatePlayer(_, { _id, input }) {
-      const player = await Player.findById(_id).update(input);
+    addPlayer: combineResolvers(
+      isAuthenticated,
+      async (_, { input }) => {
+        return await Player.create(input)
+      }
+    ),
+    updatePlayer: combineResolvers(
+      isAuthenticated,
+      async(_, { _id, input }) => {
+        const player = await Player.findById(_id).update(input);
 
-      return player.n ? 'ok' : 'Cannot be modified';
-    },
-    async removePlayer(_, { _id }) {
-      const resp = await Player.findById(_id).remove()
+        return player.n ? 'ok' : 'Cannot be modified';
+      }
+    ),
+    removePlayer: combineResolvers(
+      isAuthenticated,
+      async (_, { _id }) => {
+        const resp = await Player.findById(_id).remove()
 
-      return resp.n ? _id : 'Cannot be removed';
-    }
+        return resp.n ? _id : 'Cannot be removed';
+      }
+    )
   },
   Player: {
     async games(player) {

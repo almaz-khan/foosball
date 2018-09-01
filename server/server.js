@@ -4,6 +4,7 @@ import { schema } from './schemas/schemas'
 import { ApolloServer } from 'apollo-server-express'
 import mongoose from 'mongoose'
 import config from './config/config'
+import jwt from 'jsonwebtoken'
 
 const app = express()
 // db.url is different depending on NODE_ENV
@@ -14,7 +15,30 @@ mongoose.connect(config.db.url)
 // }
 // setup the app middlware
 appMiddlware(app)
-const server = new ApolloServer({ schema })
+
+const getMe = async req => {
+  const token = req.headers['access_token'];
+
+  if (token) {
+    try {
+      return await jwt.verify(token, config.secret)
+    } catch (e) {
+      throw new AuthenticationError('Your session expired. Sign in again.')
+    }
+  }
+}
+const server = new ApolloServer({
+  schema,
+  context: async ({req}) => {
+    const me = await getMe(req);
+
+    return {
+      me,
+      secret: config.secret
+    }
+
+  }
+})
 server.applyMiddleware({ app })
 
 // set up global error handling
