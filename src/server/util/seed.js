@@ -1,7 +1,7 @@
-const Player = require('../api/player/playerModel')
-const Game = require('../api/game/gameModel')
-const _ = require('lodash')
-const logger = require('./logger')
+import Player from '../schemas/palyers/playerModel'
+import Game from '../schemas/games/gameModel'
+import _ from 'lodash'
+import logger from './logger'
 
 logger.log('Seeding the Database')
 
@@ -100,8 +100,10 @@ const createGames = function(data) {
     .catch(error => console.log(error))
 }
 
-cleanDB()
-  .then(createPlayers)
-  .then(createGames)
-  .then(logger.log.bind(logger))
-  .catch(logger.log.bind(logger))
+export default () => {
+  cleanDB()
+    .then(createPlayers)
+    .then(createGames)
+    .then(logger.log.bind(logger))
+    .catch(logger.log.bind(logger))
+}

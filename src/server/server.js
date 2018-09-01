@@ -5,14 +5,16 @@ import { ApolloServer } from 'apollo-server-express'
 import mongoose from 'mongoose'
 import config from './config/config'
 import jwt from 'jsonwebtoken'
+import seed from './util/seed'
+import logger from './util/logger'
 
 const app = express()
 // db.url is different depending on NODE_ENV
 mongoose.connect(config.db.url)
 
-// if (config.seed) {
-//   require('./util/seed')
-// }
+if (config.seed) {
+  seed()
+}
 // setup the app middlware
 appMiddlware(app)
 
@@ -49,7 +51,7 @@ app.use(function(err, req, res, next) {
     return
   }
 
-  // logger.error(err.stack)
+  logger.error(err.stack)
   res.status(500).send('Oops')
 })
 

@@ -1,9 +1,8 @@
 // no const needed here, colors will attached colors
 // to String.prototype
-require('colors')
-const _ = require('lodash')
-
-const config = require('../config/config')
+import colors from 'colors'
+import _ from 'lodash'
+import config from '../config/config'
 
 // create a noop (no operation) function for when loggin is disabled
 const noop = function(){}
@@ -48,4 +47,4 @@ const logger = {
   }
 }
 
-module.exports = logger
+export default logger
