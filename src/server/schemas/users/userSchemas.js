@@ -8,7 +8,7 @@ export const userSchema = makeExecutableSchema({
       password: String!
     }
     type Query {
-      user(_id: ID!): User
+      getUser: User
     }
     type Mutation {
       signUp(

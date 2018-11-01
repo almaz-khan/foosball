@@ -1,6 +1,8 @@
 import User from './userModel'
 import jwt from 'jsonwebtoken'
+import { combineResolvers } from 'graphql-resolvers'
 import bcrypt from 'bcrypt'
+import { isAuthenticated } from '../authorization/authorizationResolver';
 
 const createToken = async (user, secret, expiresIn) => {
   const { id, email, username } = user
@@ -10,9 +12,12 @@ const createToken = async (user, secret, expiresIn) => {
 
 export const usersResolvers = {
   Query: {
-    async user(_, {_id}) {
-      return await User.findById(_id)
-    }
+    getUser: combineResolvers(
+      isAuthenticated,
+      (_, args, { me }) => {
+        return me;
+      }
+    )
   },
 
   Mutation: {
@@ -20,7 +25,7 @@ export const usersResolvers = {
       const user = await User.create({username, email, password})
 
       return {
-        token: await createToken(user, secret, '30m')
+        token: await createToken(user, secret, '1000h')
       }
     },
     async signIn(_, { email, password }, { models, secret }) {
@@ -38,7 +43,7 @@ export const usersResolvers = {
           throw new AuthenticationError('Invalid password.');
         }
 
-        return { token: createToken(user, secret, '30m') };
+        return { token: createToken(user, secret, '1000h') };
       }
   }
 }

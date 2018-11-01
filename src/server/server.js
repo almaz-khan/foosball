@@ -19,10 +19,11 @@ if (config.seed) {
 appMiddlware(app)
 
 const getMe = async req => {
-  const token = req.headers['access_token'];
+  let token = req.headers['access_token'];
 
   if (token) {
     try {
+      token = token.replace('Bearer ', '')
       return await jwt.verify(token, config.secret)
     } catch (e) {
       throw new AuthenticationError('Your session expired. Sign in again.')
