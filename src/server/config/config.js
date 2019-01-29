@@ -7,9 +7,7 @@ const config = {
   port: process.env.PORT || 3000,
   // 10 days in seconds
   expireTime: 24 * 60 * 10 * 60,
-  secrets: {
-    jwt: process.env.JWT || 'gumball'
-  }
+  secret: process.env.SECRET || 'gumball'
 }
 
 process.env.NODE_ENV = process.env.NODE_ENV || config.dev
