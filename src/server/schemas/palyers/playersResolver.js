@@ -2,7 +2,6 @@ import { combineResolvers } from 'graphql-resolvers';
 import Player from './playerModel'
 import Game from '../games/gameModel'
 import { isAuthenticated } from '../authorization/authorizationResolver';
-import '@babel/polyfill';
 
 export const playersResolvers = {
   Query: {
@@ -31,7 +30,7 @@ export const playersResolvers = {
     removePlayer: combineResolvers(
       isAuthenticated,
       async (_, { _id }) => {
-        const resp = await Player.findById(_id).remove()
+        const resp = await Player.deleteOne({_id})
 
         return resp.n ? _id : 'Cannot be removed';
       }

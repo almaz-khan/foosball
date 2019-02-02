@@ -10,7 +10,7 @@ import logger from './util/logger'
 
 const app = express()
 // db.url is different depending on NODE_ENV
-mongoose.connect(config.db.url)
+mongoose.connect(config.db.url, { useNewUrlParser: true })
 
 if (config.seed) {
   seed()

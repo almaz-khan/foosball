@@ -63,7 +63,7 @@ const cleanDB = function() {
   logger.log('... cleaning the DB')
   const cleanPromises = [Player, Game]
     .map(function(model) {
-      return model.remove().exec()
+      return model.deleteMany().exec()
     })
   return Promise.all(cleanPromises)
 }
