@@ -2,6 +2,7 @@ import express from 'express'
 import appMiddlware from './middleware/appMiddlware'
 import { schema } from './schemas/schemas'
 import { ApolloServer } from 'apollo-server-express'
+import { AuthenticationError } from 'apollo-server'
 import mongoose from 'mongoose'
 import config from './config/config'
 import jwt from 'jsonwebtoken'
@@ -26,7 +27,7 @@ const getMe = async req => {
       token = token.replace('Bearer ', '')
       return await jwt.verify(token, config.secret)
     } catch (e) {
-      throw new AuthenticationError('Your session expired. Sign in again.')
+      return new AuthenticationError('Your session expired. Sign in again.')
     }
   }
 }
