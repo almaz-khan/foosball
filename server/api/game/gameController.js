@@ -22,30 +22,17 @@ exports.params = function(req, res, next, id) {
 }
 
 exports.get = function(req, res, next) {
-  const query = req.query && req.query.source ? {source: req.query.source} : {}
+  const {
+    skip,
+    limit,
+    ...query
+  } = req.query;
 
-  Game.find(query)
+  Game.find(query, null, { skip: +skip, limit: +limit })
     .populate({path: 'red.offense red.defense blue.offense blue.defense'})
     .exec()
     .then(function(games){
-
-      if (req.query.csv) {
-        const flatGames = games.map(item => {
-          const objItem = item.toObject({
-            transform: (doc, ret, options) => {
-              delete ret._id
-              return ret
-            },
-            versionKey: false
-          })
-
-          return flatten(objItem)
-        })
-
-        res.csv(flatGames, true)
-      } else {
-        res.json(games)
-      }
+      res.json(games)
     }, function(err){
       next(err)
     })

@@ -66,6 +66,16 @@ router.route('/')
  *         type: string
  *         required: false
  *         description: Filter games by source
+ *       - in: query
+ *         name: skip
+ *         type: number
+ *         required: false
+ *         description: skip first n items
+ *       - in: query
+ *         name: limit
+ *         type: number
+ *         required: false
+ *         description: return limit items
  *     produces:
  *       - application/json
  *     responses:
