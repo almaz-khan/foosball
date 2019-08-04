@@ -9,17 +9,18 @@ router.route('/')
 
 /**
  * @swagger
- * definitions:
- *   Players:
- *     required:
- *       - firstName
- *     properties:
- *       _id:
- *         type: string
- *       firstName:
- *         type: string
- *       lastName:
- *         type: string
+ * components:
+ *   schemas:
+ *     Players:
+ *       required:
+ *         - firstName
+ *       properties:
+ *         _id:
+ *           type: string
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
  */
 
 /**
@@ -31,16 +32,17 @@ router.route('/')
 
 /**
  * @swagger
- * /api/players:
- *   get:
- *     summary: Get Players
- *     description: Get All Players
- *     tags: [Players]
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Success get all players
+ * paths:
+ *   /api/players:
+ *     get:
+ *       summary: Get Players
+ *       description: Get All Players
+ *       tags: [Players]
+ *       produces:
+ *         - application/json
+ *       responses:
+ *         200:
+ *           description: Success get all players
  */
 
   .get(controller.get)
@@ -56,11 +58,13 @@ router.route('/')
  *       - name: firstName
  *         description: Player's name
  *         in: formData
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *       - name: lastName
  *         description: Player's surname
- *         type: string
+ *         schema:
+ *           type: string
  *         in: formData
  *     produces:
  *       - application/json
@@ -82,7 +86,8 @@ router.route('/:id')
  *       - name: id
  *         description: Player's id
  *         in: path
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *     produces:
  *       - application/json
@@ -106,16 +111,19 @@ router.route('/:id')
  *       - name: id
  *         description: Player's id
  *         in: path
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *       - name: firstName
  *         description: Name you want to edit
  *         in: formData
- *         type: string
+ *         schema:
+ *           type: string
  *       - name: lastName
  *         description: Surname you want to edit
  *         in: formData
- *         type: string
+ *         schema:
+ *           type: string
  *     produces:
  *       - application/json
  *     responses:
@@ -138,7 +146,8 @@ router.route('/:id')
  *       - name: id
  *         description: Player's id
  *         in: path
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *     produces:
  *       - application/json

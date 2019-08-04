@@ -11,38 +11,39 @@ router.route('/')
 
 /**
  * @swagger
- * definitions:
- *   Games:
- *     required:
- *       - red/offense
- *       - red/defense
- *       - blue/offense
- *       - blue/defense
- *     properties:
- *       startDate:
- *         type: date
- *       endDate:
- *         type: date
- *       source:
- *         type: string
- *       metadata:
- *         type: object
- *       red:
- *         properties:
- *           score:
- *             type: number
- *           offense:
- *             $ref: "#/definitions/Players"
- *           defense:
- *             $ref: "#/definitions/Players"
- *       blue:
- *         properties:
- *           score:
- *             type: number
- *           offense:
- *             $ref: "#/definitions/Players"
- *           defense:
- *             $ref: "#/definitions/Players"
+ * components:
+ *   schemas:
+ *     Games:
+ *       required:
+ *         - red/offense
+ *         - red/defense
+ *         - blue/offense
+ *         - blue/defense
+ *       properties:
+ *         startDate:
+ *           type: date
+ *         endDate:
+ *           type: date
+ *         source:
+ *           type: string
+ *         metadata:
+ *           type: object
+ *         red:
+ *           properties:
+ *             score:
+ *               type: number
+ *             offense:
+ *               $ref: "#/components/schemas/Players"
+ *             defense:
+ *               $ref: "#/components/schemas/Players"
+ *         blue:
+ *           properties:
+ *             score:
+ *               type: number
+ *             offense:
+ *               $ref: "#/components/schemas/Players"
+ *             defense:
+ *               $ref: "#/components/schemas/Players"
  *
  */
 
@@ -55,32 +56,53 @@ router.route('/')
 
 /**
  * @swagger
- * /api/games:
- *   get:
- *     summary: Get Games
- *     description: Get All Games
- *     tags: [Games]
- *     parameters:
- *       - in: query
- *         name: source
- *         type: string
- *         required: false
- *         description: Filter games by source
- *       - in: query
- *         name: skip
- *         type: number
- *         required: false
- *         description: skip first n items
- *       - in: query
- *         name: limit
- *         type: number
- *         required: false
- *         description: return limit items
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Success get all games
+ * paths:
+ *   /api/games:
+ *     get:
+ *       summary: Get Games
+ *       description: Get All Games
+ *       tags: [Games]
+ *       parameters:
+ *         - in: query
+ *           name: source
+ *           schema:
+ *             type: string
+ *           required: false
+ *           description: Filter games by source
+ *         - in: query
+ *           style: deepObject
+ *           explode: false
+ *           name: startDate
+ *           schema:
+ *             type: object
+ *           required: false
+ *           properties:
+ *             gte:
+ *               type: string
+ *               pattern: '^\d{4}-\d{2}-\d{2}$'
+ *             lte:
+ *               type: string
+ *               pattern: '^\d{4}-\d{2}-\d{2}$'
+ *           description: filter by start date
+ *           example:
+ *             lte: '2019-12-28'
+ *         - in: query
+ *           name: skip
+ *           schema:
+ *             type: number
+ *           required: false
+ *           description: skip first n items
+ *         - in: query
+ *           name: limit
+ *           schema:
+ *             type: number
+ *           required: false
+ *           description: return limit items
+ *       produces:
+ *         - application/json
+ *       responses:
+ *         200:
+ *           description: Success get all games
  */
 
   .get(controller.get)
@@ -98,7 +120,7 @@ router.route('/')
  *       description: "Game obj"
  *       required: true
  *       schema:
- *         $ref: "#/definitions/Games"
+ *         $ref: "#/components/schemas/Games"
  *     produces:
  *       - application/json
  *     responses:
@@ -121,7 +143,8 @@ router.route('/:id')
  *       - name: id
  *         description: Game's id
  *         in: path
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *     produces:
  *       - application/json
@@ -145,14 +168,15 @@ router.route('/:id')
  *       - name: id
  *         description: Game's id
  *         in: path
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *       - in: "body"
  *         name: "body"
  *         description: "Game obj"
  *         required: true
  *         schema:
- *           $ref: "#/definitions/Games"
+ *           $ref: "#/components/schemas/Games"
  *     produces:
  *       - application/json
  *     responses:
@@ -175,7 +199,8 @@ router.route('/:id')
  *       - name: id
  *         description: Game's id
  *         in: path
- *         type: string
+ *         schema:
+ *           type: string
  *         required: true
  *     produces:
  *       - application/json

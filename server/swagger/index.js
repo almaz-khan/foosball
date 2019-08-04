@@ -5,6 +5,7 @@ const swaggerUi = require('swagger-ui-express')
 
 const options = {
   swaggerDefinition: {
+    openapi: '3.0.0',
     info: {
       title: 'Foosbal', // Title (required)
       version: '0.0.1', // Version (required)
