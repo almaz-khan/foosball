@@ -21,9 +21,11 @@ router.route('/')
  *         - blue/defense
  *       properties:
  *         startDate:
- *           type: date
+ *           type: string
+ *           format: date-time
  *         endDate:
- *           type: date
+ *           type: string
+ *           format: date-time
  *         source:
  *           type: string
  *         metadata:
@@ -71,21 +73,38 @@ router.route('/')
  *           description: Filter games by source
  *         - in: query
  *           style: deepObject
- *           explode: false
+ *           explode: true
  *           name: startDate
  *           schema:
  *             type: object
  *           required: false
  *           properties:
- *             gte:
+ *             $gte:
  *               type: string
- *               pattern: '^\d{4}-\d{2}-\d{2}$'
- *             lte:
+ *               format: date-time
+ *             $lte:
  *               type: string
- *               pattern: '^\d{4}-\d{2}-\d{2}$'
+ *               format: date-time
  *           description: filter by start date
  *           example:
- *             lte: '2019-12-28'
+ *             $lte: '2019-01-14T00:00:00.000Z'
+ *         - in: query
+ *           style: deepObject
+ *           explode: true
+ *           name: endDate
+ *           schema:
+ *             type: object
+ *           required: false
+ *           properties:
+ *             $gte:
+ *               type: string
+ *               format: date-time
+ *             $lte:
+ *               type: string
+ *               format: date-time
+ *           description: filter by start date
+ *           example:
+ *             $gte: '2019-01-14T00:00:00.000Z'
  *         - in: query
  *           name: skip
  *           schema:
