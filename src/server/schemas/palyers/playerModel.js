@@ -10,6 +10,9 @@ const PlayerSchema = new Schema({
 
   lastName: {
     type: String
+  },
+  deleted: {
+    type: Boolean
   }
 })
 

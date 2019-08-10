@@ -6,7 +6,7 @@ import { isAuthenticated } from '../authorization/authorizationResolver';
 export const playersResolvers = {
   Query: {
     async players() {
-      return await Player.find()
+      return await Player.find({deleted: false})
     },
     async player(_, {_id}) {
       return await Player.findById(_id)
@@ -16,13 +16,13 @@ export const playersResolvers = {
     addPlayer: combineResolvers(
       isAuthenticated,
       async (_, { input }) => {
-        return await Player.create(input)
+        return await Player.create({...input, deleted: false})
       }
     ),
     updatePlayer: combineResolvers(
       isAuthenticated,
       async(_, { _id, input }) => {
-        const player = await Player.findById(_id).update(input);
+        const player = await Player.findById(_id).updateOne(input);
 
         return player.n ? 'ok' : 'Cannot be modified';
       }
@@ -30,9 +30,10 @@ export const playersResolvers = {
     removePlayer: combineResolvers(
       isAuthenticated,
       async (_, { _id }) => {
-        const resp = await Player.deleteOne({_id})
+        const player = await Player.findById(_id);
+        const updated = await player.updateOne({ deleted: true })
 
-        return resp.n ? _id : 'Cannot be removed';
+        return updated.n && !player.deleted ? _id : 'Cannot be removed';
       }
     )
   },
