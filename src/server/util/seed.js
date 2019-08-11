@@ -71,7 +71,7 @@ const cleanDB = function() {
 const createPlayers = function(data) {
 
   const promises = players.map(function(player) {
-    return createDoc(Player, player)
+    return createDoc(Player, {...player, deleted: false})
   })
 
   return Promise.all(promises)

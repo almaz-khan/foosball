@@ -20,7 +20,7 @@ if (config.seed) {
 appMiddlware(app)
 
 const getMe = async req => {
-  let token = req.headers['access_token'];
+  let token = req.headers['authorization'];
 
   if (token) {
     try {
