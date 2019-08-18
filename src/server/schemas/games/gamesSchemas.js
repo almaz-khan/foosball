@@ -27,8 +27,17 @@ export const gameSchema = makeExecutableSchema({
       red: TeamInput,
       blue: TeamInput,
     }
+    input DateFilter {
+      gte: String,
+      lte: String
+    }
+    input GameFilter {
+      startDate: DateFilter,
+      endDate: DateFilter,
+      source: String
+    }
     type Query {
-      games: [Game]
+      games(limit: Int, skip: Int, query: GameFilter): [Game]
     }
     type Mutation {
       addGame(input: GameInput): Game
