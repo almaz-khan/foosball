@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  foosball:
+    image: foosball
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    # volumes:
+    #   - ./src:/app/src:ro
+    #   - ./static:/app/static:ro
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    environment:
+      NODE_ENV: development
+    # env_file:
+    #   - ./.env
+    ports:
+      - 3000:3000
