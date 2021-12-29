@@ -5,9 +5,6 @@ services:
     image: foosball
     stdin_open: true # docker run -i
     tty: true        # docker run -t
-    # volumes:
-    #   - ./src:/app/src:ro
-    #   - ./static:/app/static:ro
     build:
       context: .
       dockerfile: ./Dockerfile.dev
@@ -17,3 +14,21 @@ services:
     #   - ./.env
     ports:
       - 3000:3000
+    networks:
+      - foosball-app
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:3.6.19-xenial
+    ports:
+      - 27017:27017
+    networks:
+      - foosball-app
+    volumes:
+      - mongo-data:/data/db
+networks:
+  foosball-app:
+    driver: bridge
+volumes:
+  mongo-data:
+    driver: local
