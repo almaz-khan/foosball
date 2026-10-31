@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -29,6 +30,10 @@
 <svelte:head><title>Game · {g.red.score}:{g.blue.score}</title></svelte:head>
 
 <a class="back" href="/games">← Games</a>
+
+{#if page.url.searchParams.has('saved')}
+	<p class="saved card" role="status">Game saved. <a href="/play">Play again</a></p>
+{/if}
 
 <section class="card board">
 	<p class="when">
@@ -105,6 +110,16 @@
 {/if}
 
 <style>
+	.saved {
+		margin: 0 0 12px;
+		padding: 12px 16px;
+		color: var(--accent);
+		font-weight: 600;
+	}
+	.saved a {
+		margin-left: 8px;
+		color: inherit;
+	}
 	.back {
 		display: inline-block;
 		margin-bottom: 12px;

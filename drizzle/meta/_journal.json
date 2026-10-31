@@ -15,6 +15,13 @@
       "when": 1793442699878,
       "tag": "0001_org_time_zone",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793443188873,
+      "tag": "0002_game_client_key",
+      "breakpoints": true
     }
   ]
 }

@@ -126,11 +126,17 @@ export const game = foosballSchema.table('game', {
   /** Who recorded it: they may edit or delete it, as may the org's admins. */
   createdBy: integer('created_by').references(() => appUser.id, { onDelete: 'set null' }),
   legacyId: text('legacy_id'),
+  /**
+   * Made by the browser that recorded the game, once per game: a retried or
+   * double-tapped save finds the game already there instead of adding it twice.
+   */
+  clientKey: text('client_key'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 }, (t) => [
   unique('game_org_id_key').on(t.orgId, t.id),
   unique('game_org_legacy_key').on(t.orgId, t.legacyId),
+  unique('game_org_client_key').on(t.orgId, t.clientKey),
   check('game_scores_non_negative', sql`${t.redScore} >= 0 AND ${t.blueScore} >= 0`),
   check('game_ends_after_start', sql`${t.endedAt} IS NULL OR ${t.startedAt} IS NULL OR ${t.endedAt} >= ${t.startedAt}`),
   index('game_org_played_idx').on(t.orgId, sql`coalesce(${t.endedAt}, ${t.startedAt}, ${t.createdAt}) DESC`),

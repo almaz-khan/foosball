@@ -37,6 +37,8 @@ export interface GameInput {
   blue: Side<number>;
   source?: string;
   metadata?: Record<string, unknown>;
+  /** Set by the recording browser: saving the same key twice returns the first game. */
+  clientKey?: string | null;
 }
 
 /** A failure whose message is safe and useful to show the person entering the game. */
@@ -91,6 +93,8 @@ export async function createGame(
   db: Executor = getDb(),
 ): Promise<number> {
   validate(input);
+  const clientKey = input.clientKey ?? null;
+  if (clientKey !== null && !CLIENT_KEY.test(clientKey)) throw new GameError('This game could not be saved. Reload the page and try again.');
   return db.transaction(async (tx) => {
     await checkRoster(orgId, input, tx);
     const [row] = await tx
@@ -104,12 +108,25 @@ export async function createGame(
         source: input.source?.trim().slice(0, 40) || 'web',
         metadata: input.metadata ?? {},
         createdBy,
+        clientKey,
       })
+      .onConflictDoNothing({ target: [game.orgId, game.clientKey] })
       .returning({ id: game.id });
-    await tx.insert(gamePlayer).values(seats(input).map((s) => ({ orgId, gameId: row!.id, ...s })));
-    return row!.id;
+    if (!row) {
+      // Saved already, by an earlier try of this same save.
+      const [first] = await tx
+        .select({ id: game.id })
+        .from(game)
+        .where(and(eq(game.orgId, orgId), eq(game.clientKey, clientKey!)));
+      return first!.id;
+    }
+    await tx.insert(gamePlayer).values(seats(input).map((s) => ({ orgId, gameId: row.id, ...s })));
+    return row.id;
   });
 }
+
+/** Keys from browsers: a UUID or similar, never anything long. */
+const CLIENT_KEY = /^[A-Za-z0-9_-]{8,64}$/;
 
 /** Replaces a game's times, scores and seats. Source, metadata and recorder stay as they were. */
 export async function updateGame(orgId: number, id: number, input: GameInput, db: Executor = getDb()): Promise<boolean> {

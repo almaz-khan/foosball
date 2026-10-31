@@ -35,12 +35,17 @@ export function parseGameForm(form: FormData, zone: string): { input: GameInput 
   ] as const) {
     const value = text(name);
     if (!value) continue;
-    const parsed = parseDateTime(value, zone);
-    if (!parsed) return { error: `The ${label} time is not a valid date and time.` };
+    // A person types wall time in the org's zone; the live scoreboard sends the exact instant.
+    const parsed = INSTANT.test(value) ? new Date(value) : parseDateTime(value, zone);
+    if (!parsed || Number.isNaN(parsed.getTime())) return { error: `The ${label} time is not a valid date and time.` };
     times[key] = parsed;
   }
   if (times.endedAt && times.endedAt.getTime() > Date.now() + 5 * 60_000) {
     return { error: 'A game cannot end in the future.' };
   }
-  return { input: { ...times, red: sides.red, blue: sides.blue } };
+  const clientKey = text('client_key') || null;
+  return { input: { ...times, red: sides.red, blue: sides.blue, ...(clientKey ? { clientKey } : {}) } };
 }
+
+/** An ISO 8601 instant with its offset, as `Date.prototype.toISOString` writes it. */
+const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/;
