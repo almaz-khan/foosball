@@ -104,6 +104,16 @@ function validDay(y: number, m: number, d: number): boolean {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+export const PERIODS = ['month', 'year', 'all'] as const;
+export type PeriodName = (typeof PERIODS)[number];
+
+/** When the current calendar month or year began in the zone; null for all time. */
+export function periodStart(period: PeriodName, zone: string, now: Date = new Date()): Date | null {
+  if (period === 'all') return null;
+  const w = wall(now, zone);
+  return fromWall({ year: w.year, month: period === 'month' ? w.month : 1, day: 1, hour: 0, minute: 0 }, zone);
+}
+
 /** The value an `<input type="datetime-local">` shows for this instant in the zone. */
 export function toDateTimeInput(date: Date | null, zone: string): string {
   if (!date) return '';

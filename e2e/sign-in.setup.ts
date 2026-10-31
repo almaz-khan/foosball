@@ -16,7 +16,7 @@ setup('Ann joins the office from her invite', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Create passkey and join' }).click();
 
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByText('You play as Ann Lee')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Your record' })).toBeVisible();
   await expect(page.locator('header')).toContainText('admin');
 
   // The link is spent.

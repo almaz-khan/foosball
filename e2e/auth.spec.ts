@@ -14,13 +14,15 @@ test('an invite creates an account with a passkey, which then signs in again', a
   await expect(page.getByText('playing as Ben Ng')).toBeVisible();
   await page.getByRole('button', { name: 'Create passkey and join' }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByText('You play as Ben Ng')).toBeVisible();
+  await expect(page.locator('header')).toContainText('Ben');
+  await expect(page.getByRole('link', { name: 'Record a game' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Sign out' }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByText('You play as Ben Ng')).toBeVisible();
+  await expect(page.locator('header')).toContainText('Ben');
+  await expect(page.getByRole('link', { name: 'Record a game' })).toBeVisible();
 
   // Signed in, another invite to the same org says so instead of making a second account.
   await page.goto(`/invite/${links.viewer}`);
