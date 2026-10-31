@@ -22,6 +22,17 @@ export default defineConfig({
     extraHTTPHeaders: { 'x-forwarded-proto': 'http' },
     trace: 'retain-on-failure',
   },
+  projects: [
+    // Ann, the org's admin, joins through her invite once; the app specs start signed in as her.
+    { name: 'sign-in', testMatch: /sign-in\.setup\.ts/ },
+    { name: 'accounts', testMatch: /auth\.spec\.ts/, dependencies: ['sign-in'] },
+    {
+      name: 'app',
+      testIgnore: [/auth\.spec\.ts/, /\.setup\.ts/],
+      dependencies: ['sign-in'],
+      use: { storageState: 'e2e/.auth/ann.json' },
+    },
+  ],
   webServer: {
     command: 'bun e2e/serve.ts',
     url: `http://localhost:${PORT}/healthz`,

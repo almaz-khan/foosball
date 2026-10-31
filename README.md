@@ -40,7 +40,7 @@ app (`src/auth.ts`).
 ### Setting up an org
 
 ```sh
-foosball org create "Office" --slug office
+foosball org create "Office" --slug office --tz Europe/Prague   # games are shown in the org's zone
 foosball player add --org office Almaz K          # optional: their player, if not created by the invite
 foosball invite create --org office --name Almaz --admin --player <id>
 #   or: --new-player "Almaz K"   (creates the player when the invite is used)

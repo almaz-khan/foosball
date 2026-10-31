@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, lt, or, sql, type SQL } from 'drizzle-orm';
 import { getDb, type Executor } from './db/index.ts';
-import { game, gamePlayer, player, POSITIONS, TEAMS, type Position, type Team } from './db/schema.ts';
+import { appUser, game, gamePlayer, player, POSITIONS, TEAMS, type Position, type Team } from './db/schema.ts';
 import { fullName } from './orgs.ts';
 
 export interface PlayerRef {
@@ -24,6 +24,8 @@ export interface Game {
   source: string;
   metadata: Record<string, unknown>;
   createdBy: number | null;
+  /** The account that recorded it, by name; null for imported games or a deleted account. */
+  recordedBy: string | null;
   red: Side<PlayerRef>;
   blue: Side<PlayerRef>;
 }
@@ -198,10 +200,12 @@ const selectGames = (db: Executor) =>
       source: game.source,
       metadata: game.metadata,
       createdBy: game.createdBy,
+      recordedBy: appUser.name,
       redScore: game.redScore,
       blueScore: game.blueScore,
     })
     .from(game)
+    .leftJoin(appUser, eq(appUser.id, game.createdBy))
     .$dynamic();
 
 type GameRow = Awaited<ReturnType<ReturnType<typeof selectGames>['execute']>>[number];

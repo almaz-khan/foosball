@@ -159,7 +159,7 @@ describe('players', () => {
 
 describe('permissions', () => {
   test('recorders and admins may edit a game; other members may not', async () => {
-    const member = { orgId: 1, orgName: 'Office', orgSlug: 'office', role: 'member' as const, playerId: 1, playerName: 'Ann' };
+    const member = { orgId: 1, orgName: 'Office', orgSlug: 'office', orgTimeZone: 'Europe/Prague', role: 'member' as const, playerId: 1, playerName: 'Ann' };
     expect(canEditGame(member, 7, 7)).toBe(true);
     expect(canEditGame(member, 7, 8)).toBe(false);
     expect(canEditGame(member, 7, null)).toBe(false);

@@ -126,7 +126,8 @@ foosball/
 
 ### Data model (`foosball` schema)
 ```
-org              id serial pk, name text not null, slug text unique not null, created_at
+org              id serial pk, name text not null, slug text unique not null,
+                 time_zone text not null default 'Europe/Prague' (games are shown and filtered in it), created_at
 app_user         id serial pk, name text unique, webauthn_id bytea unique (ASCII handle), created_at
 org_member       org_id → org (cascade), user_id → app_user (cascade), role ('admin'|'member'),
                  player_id → player null (set null), created_at,

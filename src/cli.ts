@@ -15,7 +15,9 @@ const USAGE = `foosball — command line for the server
   foosball migrate                         apply the drizzle/ migrations
   foosball seed                            a "demo" org with 4 players and 2 games (once)
 
-  foosball org create <name> --slug <s>    a new org
+  foosball org create <name> --slug <s> [--tz <zone>]
+                                           a new org; games are shown in its time zone
+                                           (default Europe/Prague)
   foosball org list
 
   foosball invite create --org <s> --name <name> [--admin]
@@ -130,16 +132,16 @@ async function cmdOrg(flags: Flags, [sub, ...names]: string[]): Promise<number> 
   switch (sub) {
     case 'create': {
       const name = names.join(' ');
-      if (!name || !flags.slug) throw new Usage('foosball org create <name> --slug <slug>');
-      const org = await createOrg(name, flags.slug);
-      console.log(`created org "${org.name}" (${org.slug})`);
+      if (!name || !flags.slug) throw new Usage('foosball org create <name> --slug <slug> [--tz <zone>]');
+      const org = await createOrg(name, flags.slug, undefined, flags.tz || undefined);
+      console.log(`created org "${org.name}" (${org.slug}), times in ${org.timeZone}`);
       console.log(`next: foosball invite create --org ${org.slug} --name <your name> --admin`);
       return 0;
     }
     case 'list': {
       const orgs = await listOrgs();
       if (orgs.length === 0) console.log('no orgs — run `foosball org create <name> --slug <slug>`');
-      for (const o of orgs) console.log(`  ${String(o.id).padStart(3)}  ${o.slug.padEnd(20)} ${o.name}`);
+      for (const o of orgs) console.log(`  ${String(o.id).padStart(3)}  ${o.slug.padEnd(20)} ${o.name.padEnd(24)} ${o.timeZone}`);
       return 0;
     }
     default:

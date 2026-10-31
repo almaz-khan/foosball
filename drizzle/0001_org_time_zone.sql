@@ -1,0 +1,1 @@
+ALTER TABLE "foosball"."org" ADD COLUMN "time_zone" text DEFAULT 'Europe/Prague' NOT NULL;

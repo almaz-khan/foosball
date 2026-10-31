@@ -52,6 +52,8 @@ export const org = foosballSchema.table('org', {
   name: text('name').notNull(),
   /** Short, URL-safe handle used by the CLI: `--org office`. */
   slug: text('slug').notNull().unique(),
+  /** The IANA zone the org's games are shown and filtered in: one table, one clock. */
+  timeZone: text('time_zone').notNull().default('Europe/Prague'),
   createdAt: createdAt(),
 }, (t) => [check('org_slug_format', sql`${t.slug} ~ '^[a-z0-9][a-z0-9-]{0,39}$'`)]);
 

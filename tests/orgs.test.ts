@@ -120,7 +120,7 @@ describe('members', () => {
 
 describe('what a request may do', () => {
   const member = (over: Partial<Membership> = {}): Membership => ({
-    orgId: 1, orgName: 'Office', orgSlug: 'office', role: 'member', playerId: 3, playerName: 'Ann', ...over,
+    orgId: 1, orgName: 'Office', orgSlug: 'office', orgTimeZone: 'Europe/Prague', role: 'member', playerId: 3, playerName: 'Ann', ...over,
   });
   const locals = (m: Membership | null) =>
     ({ session: { userId: 1, userName: 'Ann' }, memberships: m ? [m] : [], member: m }) as unknown as App.Locals;

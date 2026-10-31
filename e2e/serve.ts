@@ -1,6 +1,7 @@
 /**
- * Playwright's web server: a fresh e2e database with an org and invite links
- * for the specs, then the production build (`bun run build` first) on E2E_PORT.
+ * Playwright's web server: a fresh e2e database with an org, players, a few
+ * games and invite links for the specs, then the production build (`bun run
+ * build` first) on E2E_PORT.
  *
  * Its own database, foosball_e2e, so an e2e run and `bun test` never trample
  * each other's data; never the one in .env.
@@ -15,12 +16,28 @@ const { freshDatabase, testDatabaseUrl } = await import('../tests/helpers/testdb
 const { createOrg } = await import('../src/lib/server/orgs.ts');
 const { createPlayer } = await import('../src/lib/server/players.ts');
 const { createInvite } = await import('../src/lib/server/invites.ts');
+const { createGame } = await import('../src/lib/server/games.ts');
 
 const db = await freshDatabase();
 const office = await createOrg('Office', 'office', db);
-const ann = await createPlayer(office.id, { firstName: 'Ann', lastName: 'Lee' }, db);
+const [ann, cat, dan, eve] = await Promise.all(
+  [
+    { firstName: 'Ann', lastName: 'Lee' },
+    { firstName: 'Cat' },
+    { firstName: 'Dan' },
+    { firstName: 'Eve' },
+  ].map((p) => createPlayer(office.id, p, db)),
+);
+// Three past games, as if imported: no recorder, so only an admin may change them.
+const day = (d: number, h: number) => new Date(Date.UTC(2026, 9, d, h));
+const seats = { red: { offense: ann!.id, defense: cat!.id }, blue: { offense: dan!.id, defense: eve!.id } };
+await createGame(office.id, { startedAt: day(5, 9), endedAt: day(5, 10), red: { score: 10, ...seats.red }, blue: { score: 4, ...seats.blue }, source: 'reactApp' }, null, db);
+await createGame(office.id, { startedAt: day(6, 9), endedAt: day(6, 10), red: { score: 6, ...seats.red }, blue: { score: 10, ...seats.blue } }, null, db);
+await createGame(office.id, { startedAt: day(7, 9), endedAt: day(7, 10), red: { score: 10, offense: eve!.id, defense: cat!.id }, blue: { score: 9, offense: dan!.id, defense: ann!.id } }, null, db);
+
 const links = {
-  admin: (await createInvite({ orgId: office.id, invitedName: 'Ann', role: 'admin', player: { playerId: ann.id } }, db)).token,
+  admin: (await createInvite({ orgId: office.id, invitedName: 'Ann', role: 'admin', player: { playerId: ann!.id } }, db)).token,
+  newcomer: (await createInvite({ orgId: office.id, invitedName: 'Ben', player: { firstName: 'Ben', lastName: 'Ng' } }, db)).token,
   viewer: (await createInvite({ orgId: office.id, invitedName: 'Vic' }, db)).token,
 };
 await db.$client.end({ timeout: 5 });
