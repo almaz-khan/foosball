@@ -152,3 +152,9 @@ export function formatDuration(ms: number): string {
   if (minutes < 60) return `${minutes} min`;
   return `${Math.floor(minutes / 60)} h ${pad(minutes % 60)} min`;
 }
+
+/** "31 Oct 2026", in the zone. */
+export function formatDay(date: Date, zone: string): string {
+  const w = wall(date, zone);
+  return `${w.day} ${MONTHS[w.month - 1]} ${w.year}`;
+}

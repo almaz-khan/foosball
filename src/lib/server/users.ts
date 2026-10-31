@@ -80,3 +80,11 @@ export async function renameUser(from: string, to: string, db: Executor = getDb(
   const rows = await db.update(appUser).set({ name: clean }).where(eq(appUser.name, from)).returning({ id: appUser.id });
   return rows.length > 0;
 }
+
+/** A person renaming themselves. */
+export async function renameUserById(userId: number, to: string, db: Executor = getDb()): Promise<void> {
+  const clean = cleanUserName(to);
+  const taken = await findUser(clean, db);
+  if (taken && taken.id !== userId) throw new UserError(`Someone is already called “${clean}”.`);
+  await db.update(appUser).set({ name: clean }).where(eq(appUser.id, userId));
+}

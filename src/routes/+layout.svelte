@@ -8,6 +8,7 @@
 		{ href: '/', label: 'Dashboard' },
 		{ href: '/games', label: 'Games' },
 		{ href: '/players', label: 'Players' },
+		...(data.can.manage ? [{ href: '/admin', label: 'Admin' }] : []),
 		...(data.can.record ? [{ href: '/play', label: 'Play' }] : [])
 	]);
 	const current = (href: string) =>
@@ -23,9 +24,9 @@
 		<div class="bar-inner">
 			<a class="brand" href="/">{data.member?.orgName ?? 'Foosball'}</a>
 			<div class="who">
-				<span class="name">
+				<a class="name" href="/account" title="Your account and passkeys">
 					{data.userName}{#if data.member?.role === 'admin'}<span class="tag">admin</span>{/if}
-				</span>
+				</a>
 				<form method="POST" action="/auth/logout">
 					<button class="link">Sign out</button>
 				</form>
@@ -89,6 +90,10 @@
 	}
 	.name {
 		color: var(--text-2);
+		text-decoration: none;
+	}
+	.name:hover {
+		color: var(--text);
 	}
 	.tag {
 		margin-left: 6px;
@@ -115,6 +120,16 @@
 		font-weight: 500;
 		text-decoration: none;
 		white-space: nowrap;
+	}
+	@media (max-width: 420px) {
+		/* Five tabs on a phone: tighter, so Play never scrolls out of sight. */
+		.tabs {
+			gap: 0;
+		}
+		.tabs a {
+			padding: 6px 8px;
+			font-size: 14px;
+		}
 	}
 	.tabs a[aria-current='page'] {
 		background: var(--fill);

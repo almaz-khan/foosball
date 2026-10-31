@@ -19,11 +19,14 @@ app (`src/auth.ts`).
 
 **Invites**
 - There is no sign-up page. An account exists once someone opens an **org invite** and creates a passkey with it.
+- Admins make invites on `/admin`, which also manages roles, player links and members. The CLI can do the same, and makes the first admin.
 - An invite is single-use and expires after `INVITE_HOURS` (default 48).
 - It can link the new member to an existing player, create a new player, or link no one. A member with no player can watch but not record.
 - Someone who already has an account just joins: opening the invite while signed in adds the org to their account.
 
 **Recovery and extra devices**
+- On `/account`, people add, rename and remove their own passkeys (never the last one), or get a 15-minute link to open on another device.
+- On `/admin`, an admin can make a 60-minute recovery link for a member, but only if they are an admin in every org that member belongs to.
 - `auth enroll --user <name>` prints a 15-minute link that adds another passkey to an existing account.
 - `auth revoke <id>` removes a passkey and signs out every session it opened.
 

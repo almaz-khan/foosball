@@ -479,6 +479,8 @@ export async function createSession(credentialId: string, db: Executor = getDb()
     .insert(authSession)
     .values({ tokenHash: hash(token), credentialId, expiresAt: inDays(SESSION_DAYS) })
     .returning({ expiresAt: authSession.expiresAt });
+  // A session opened by enrolling counts as using the passkey, as a sign-in does.
+  await db.update(authCredential).set({ lastUsedAt: now }).where(eq(authCredential.id, credentialId));
   return { token, expiresAt: row!.expiresAt };
 }
 
