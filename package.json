@@ -21,6 +21,7 @@
     "db:studio": "drizzle-kit studio",
     "test": "bun test",
     "e2e": "bun run build && playwright test",
+    "deploy": "scripts/deploy.sh",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "typecheck": "svelte-kit sync && tsc --noEmit"
   },
