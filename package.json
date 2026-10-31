@@ -1,39 +1,45 @@
 {
   "name": "foosball",
-  "version": "0.0.2",
-  "description": "",
-  "engines": {
-    "node": "16.13.1"
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "imports": {
+    "#lib": "./src/lib",
+    "#lib/*": "./src/lib/*",
+    "#foosball/*": "./src/*"
   },
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": ""
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "bun build/index.js",
+    "cli": "bun run src/cli.ts",
+    "migrate": "bun run src/cli.ts migrate",
+    "seed": "bun run src/cli.ts seed",
+    "db:up": "docker compose up -d --wait postgres",
+    "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio",
+    "test": "bun test",
+    "e2e": "bun run build && playwright test",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "typecheck": "svelte-kit sync && tsc --noEmit"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:almaz-khan/foosball.git"
-  },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.0.0",
-    "body-parser": "^1.19.0",
-    "colors": "^1.4.0",
-    "cors": "^2.8.5",
-    "csv-express": "^1.2.2",
-    "express": "^4.17.1",
-    "express-jwt": "^6.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.20",
-    "method-override": "^3.0.0",
-    "mongoose": "^6.1.4",
-    "morgan": "^1.10.0",
-    "swagger-jsdoc": "^6.1.0",
-    "swagger-ui-express": "^4.3.0"
+    "@simplewebauthn/server": "^14.0.3",
+    "drizzle-orm": "^0.45.4",
+    "postgres": "^3.4.9"
   },
   "devDependencies": {
-    "chai": "^4.3.4",
-    "supertest": "^6.1.5"
+    "@playwright/test": "^1.64.1",
+    "@simplewebauthn/browser": "^14.0.0",
+    "@sveltejs/adapter-node": "^6.0.1",
+    "@sveltejs/kit": "^3.1.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@types/bun": "^1.4.4",
+    "drizzle-kit": "^0.31.11",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.7",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5"
   }
 }

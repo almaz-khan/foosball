@@ -1,0 +1,6 @@
+[test]
+# Playwright's specs in e2e/ run under Playwright (`bun run e2e`), not here.
+root = "./tests"
+# Points the app's database handle at the throwaway test database before any
+# test file loads (bun reads .env, whose DATABASE_URL is the real one).
+preload = ["./tests/setup.ts"]

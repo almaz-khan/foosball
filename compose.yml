@@ -1,0 +1,20 @@
+# Local Postgres for development and tests: `bun run db:up`.
+# Port 5434 on localhost only, clear of other projects' Postgres (5432, 5433).
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: foosball
+    ports:
+      - '127.0.0.1:5434:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  pgdata:
