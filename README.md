@@ -102,7 +102,7 @@ Production runs at https://foosball.almaz.dev: Railway project `foosball`, envir
   - It runs svelte-check, tsc, `bun test` and the Playwright suite. `--skip-checks` skips the tests, for emergencies only.
   - Then it runs `railway up` and follows that deployment until it is live, or fails loudly if it does not go live.
   - The tests need the local Postgres (`bun run db:up`).
-- **On every deploy:** the service runs `bun run src/cli.ts migrate` as its pre-deploy command, and a new release only takes traffic once `/healthz` answers. These settings live on the Railway service. `railway.json` records the same settings, but new Railway projects don't read it (Railway has deprecated it). Moving it to `.railway/railway.ts` (`railway config migrate`) needs the `railway` npm package.
+- **On every deploy:** the service runs `bun run src/cli.ts migrate` as its pre-deploy command, and a new release only takes traffic once `/healthz` answers. These settings live on the Railway service, not in this repo: pre-deploy `bun run src/cli.ts migrate`, health check `/healthz` (60 s), restart on failure (5 retries), `dockerfilePath: Dockerfile`. Railway no longer reads `railway.json` (deprecated config as code), so there is none. Change the settings in the Railway UI or API.
 - **CLI in production:** `railway ssh --service foosball -- bun run src/cli.ts <command>`.
 
 ## Layout

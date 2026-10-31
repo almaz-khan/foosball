@@ -120,7 +120,7 @@ foosball/
 ├─ drizzle/                      generated migrations
 ├─ tests/                        bun test (domain + auth against Postgres)
 ├─ e2e/                          Playwright
-├─ Dockerfile · railway.json · compose.yml (local Postgres) · .env.example
+├─ Dockerfile · compose.yml (local Postgres) · .env.example
 └─ .github/workflows/ci.yml
 ```
 
@@ -191,7 +191,7 @@ org_invite       token_hash pk, org_id, role, player_id null, new_player_name nu
 
 | # | Phase | Contents |
 |---|---|---|
-| 0 | Scaffold | `rewrite` branch, old Express code removed, SvelteKit + Bun + Drizzle wired, `compose.yml` Postgres, `/healthz`, Dockerfile, `railway.json`, `.env.example` |
+| 0 | Scaffold | `rewrite` branch, old Express code removed, SvelteKit + Bun + Drizzle wired, `compose.yml` Postgres, `/healthz`, Dockerfile, `.env.example`. Railway service settings (pre-deploy migrate, health check) live on the service |
 | 1 | Schema | Tables above, first migration, `cli.ts migrate` + idempotent `seed` (a "Demo" org with the old 4 players and 2 games), test DB helper, domain tests for games, players and org isolation |
 | 2 | Auth & orgs | Port `auth.ts`, the auth routes, `/login`, hooks, rate limit. Add org invites, `/invite/[token]`, membership checks, CLI `org`/`invite`/`member`/`auth`/`user`. Tests |
 | 3 | Players & games | `/players`, `/games` (filters: player, date range; paging), `/games/[id]` edit and delete (creator or admin) |
