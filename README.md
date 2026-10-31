@@ -97,9 +97,9 @@ bun run dev          # http://localhost:5180
 
 Production runs at https://foosball.almaz.dev: Railway project `foosball`, environment `production`. It has a `foosball` service built from the `Dockerfile` and a Railway Postgres.
 
-- **Deploy:** `bun run deploy` (`scripts/deploy.sh`).
-  - It refuses uncommitted changes.
-  - It runs svelte-check, tsc, `bun test` and the Playwright suite. `--quick` skips the tests.
+- **Deploy:** `bun run deploy` (`scripts/deploy.sh`), from the Mac. CI only checks; it doesn't deploy.
+  - It refuses to run unless the checkout is clean and exactly `origin/main`.
+  - It runs svelte-check, tsc, `bun test` and the Playwright suite. `--skip-checks` skips the tests, for emergencies only.
   - Then it runs `railway up` and follows that deployment until it is live, or fails loudly if it does not go live.
   - The tests need the local Postgres (`bun run db:up`).
 - **On every deploy:** the service runs `bun run src/cli.ts migrate` as its pre-deploy command, and a new release only takes traffic once `/healthz` answers. These settings live on the Railway service. `railway.json` records the same settings, but new Railway projects don't read it (Railway has deprecated it). Moving it to `.railway/railway.ts` (`railway config migrate`) needs the `railway` npm package.
