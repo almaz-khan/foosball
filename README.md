@@ -93,6 +93,14 @@ bun run dev          # http://localhost:5180
 | `ADDRESS_HEADER` | – | `X-Real-IP`: the client address Railway's edge sets, for rate limiting |
 | `PROTOCOL_HEADER` / `HOST_HEADER` | – | `x-forwarded-proto` / `x-forwarded-host`, so adapter-node sees the public origin |
 
+## Deploy (Railway)
+
+Production runs at https://foosball.almaz.dev: Railway project `foosball`, environment `production`. It has a `foosball` service built from the `Dockerfile` and a Railway Postgres.
+
+- **Deploy:** `railway up --ci --service foosball`.
+- **On every deploy:** the service runs `bun run src/cli.ts migrate` as its pre-deploy command, and a new release only takes traffic once `/healthz` answers. These settings live on the Railway service. `railway.json` records the same settings, but new Railway projects don't read it (Railway has deprecated it). Moving it to `.railway/railway.ts` (`railway config migrate`) needs the `railway` npm package.
+- **CLI in production:** `railway ssh --service foosball -- bun run src/cli.ts <command>`.
+
 ## Layout
 
 - `src/auth.ts`: passkeys, enrollment links and sessions.
