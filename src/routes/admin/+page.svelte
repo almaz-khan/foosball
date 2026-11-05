@@ -91,7 +91,7 @@
 				</label>
 			{/if}
 
-			<p class="hint">The link works once, for {data.inviteHours} hours. Opening it, they create a passkey and join.</p>
+			<p class="hint">The link works once, for {data.inviteHours} hours. Opening it, they sign in at the login hub and join: the hub must already let them open Foosball.</p>
 			<div class="row">
 				<button class="primary">Create invite link</button>
 				<button class="secondary" type="button" onclick={() => (inviting = false)}>Cancel</button>
@@ -151,12 +151,6 @@
 					</form>
 				</div>
 				<div class="actions">
-					{#if m.userId !== data.me}
-						<form method="POST" action="?/recoveryLink" use:enhance>
-							<input type="hidden" name="user_id" value={m.userId} />
-							<button class="link" title="A link that adds a passkey to their account, for a new or lost device">Recovery link</button>
-						</form>
-					{/if}
 					{#if removing === m.userId}
 						<form method="POST" action="?/removeMember" use:enhance={() => async ({ update }) => {
 							await update();
@@ -170,15 +164,6 @@
 						<button class="link danger-text" type="button" onclick={() => (removing = m.userId)}>{m.userId === data.me ? 'Leave' : 'Remove'}</button>
 					{/if}
 				</div>
-				{#if form?.recovery && form.recovery.userId === m.userId}
-					<div class="made wide">
-						<p>
-							A link that adds a passkey to <strong>{form.recovery.name}</strong>’s account. It works once, for {form.recovery.minutes} minutes.
-							Send it only to them: whoever opens it can sign in as them.
-						</p>
-						<CopyLink url={form.recovery.link} />
-					</div>
-				{/if}
 			</li>
 		{/each}
 	</ul>
@@ -328,9 +313,6 @@
 		display: flex;
 		gap: 14px;
 		font-size: 14px;
-	}
-	.wide {
-		flex-basis: 100%;
 	}
 	.danger-text {
 		color: var(--bad);

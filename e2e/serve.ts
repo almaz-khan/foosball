@@ -1,7 +1,8 @@
 /**
  * Playwright's web server: a fresh e2e database with an org, players, a few
- * games and invite links for the specs, then the production build (`bun run
- * build` first) on E2E_PORT.
+ * games and invite links for the specs, a fake login hub (scripts/fakehub.ts)
+ * that signs in whoever the specs name (e2e/hub.ts), then the production
+ * build (`bun run build` first) on E2E_PORT.
  *
  * Its own database, foosball_e2e, so an e2e run and `bun test` never trample
  * each other's data; never the one in .env.
@@ -17,6 +18,8 @@ const { createOrg } = await import('../src/lib/server/orgs.ts');
 const { createPlayer } = await import('../src/lib/server/players.ts');
 const { createInvite } = await import('../src/lib/server/invites.ts');
 const { createGame } = await import('../src/lib/server/games.ts');
+const { startFakeHub } = await import('../scripts/fakehub.ts');
+const { HUB_PORT } = await import('./hub.ts');
 
 const db = await freshDatabase();
 const office = await createOrg('Office', 'office', db);
@@ -45,12 +48,17 @@ await db.$client.end({ timeout: 5 });
 mkdirSync(join(import.meta.dir, '.auth'), { recursive: true });
 writeFileSync(join(import.meta.dir, '.auth', 'links.json'), JSON.stringify(links));
 
+// Ann until a spec names someone else (e2e/hub.ts hubSignsIn).
+const hub = await startFakeHub({ port: HUB_PORT, person: { sub: 'ann', name: 'Ann', amr: ['passkey'] } });
+
 // What the built server reads at start-up. A production build assumes https
 // unless PROTOCOL_HEADER says otherwise; the test browser sends that header,
 // as the proxy in front of the real deployment does.
 Object.assign(process.env, {
   DATABASE_URL: testDatabaseUrl(),
   FOOSBALL_ORIGIN: `http://localhost:${PORT}`,
+  OIDC_ISSUER: hub.issuer,
+  OIDC_CLIENT_SECRET: hub.clientSecret,
   PROTOCOL_HEADER: 'x-forwarded-proto',
   HOST: '127.0.0.1',
   PORT,

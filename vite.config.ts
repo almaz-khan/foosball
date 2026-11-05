@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     process.env[k] ??= v;
   }
 
-  // Passkeys are bound to FOOSBALL_ORIGIN's hostname; Vite must accept it as a Host header.
+  // The login hub sends people back to FOOSBALL_ORIGIN; Vite must accept its hostname as a Host header.
   const origin = process.env.FOOSBALL_ORIGIN;
   const allowedHosts = origin ? [new URL(origin).hostname] : [];
 

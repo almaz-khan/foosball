@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   bigint,
+  boolean,
   check,
   customType,
   foreignKey,
@@ -60,9 +61,9 @@ export const org = foosballSchema.table('org', {
 export const appUser = foosballSchema.table('app_user', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
-  // WebAuthn user handle. ASCII (32 random hex characters) rather than raw
-  // bytes: some password managers (NordPass) decode user.id as UTF-8 text and
-  // re-encode it, turning every non-UTF-8 byte into U+FFFD for good.
+  /** Their person key at the login hub (the ID token's `sub`): stable, never renamed. Null until their first sign-in there. */
+  hubSub: text('hub_sub').unique(),
+  // The WebAuthn user handle from before the login hub; unused, kept for a rollback.
   webauthnId: bytea('webauthn_id')
     .notNull()
     .unique()
@@ -164,8 +165,8 @@ export const gamePlayer = foosballSchema.table('game_player', {
 // ---------------------------------------------------------------- invites
 
 /**
- * A single-use link into an org. Opened signed out, it creates an account with
- * a passkey; opened signed in, it adds the membership to that account. It may
+ * A single-use link into an org. Opened signed out, it goes through the login
+ * hub first; then it adds the membership to the account that signed in. It may
  * link the member to an existing player, create a new player, or neither
  * (a viewer).
  */
@@ -173,7 +174,7 @@ export const orgInvite = foosballSchema.table('org_invite', {
   tokenHash: bytea('token_hash').primaryKey(),
   orgId: integer('org_id').notNull().references(() => org.id, { onDelete: 'cascade' }),
   role: text('role', { enum: ROLES }).notNull().default('member'),
-  /** The name a new account gets; someone already signed in keeps theirs. */
+  /** Who it is for, as the admins' list shows it; the account keeps the name it has. */
   invitedName: text('invited_name').notNull(),
   playerId: integer('player_id'),
   newPlayerFirstName: text('new_player_first_name'),
@@ -190,7 +191,41 @@ export const orgInvite = foosballSchema.table('org_invite', {
   check('org_invite_role_check', sql`${t.role} IN ('admin', 'member')`),
 ]);
 
-// ---------------------------------------------------------------- passkeys (as in budget)
+// ---------------------------------------------------------------- sign-in through the login hub
+
+/**
+ * A browser's session, after a sign-in at the login hub. Only a hash of the
+ * cookie value is stored, so a leaked row cannot be replayed. `hubCheckedAt`
+ * is when the hub last approved this person: a page load a day later goes
+ * back through the hub (silently while the hub session lives).
+ */
+export const userSession = foosballSchema.table('user_session', {
+  tokenHash: bytea('token_hash').primaryKey(),
+  userId: integer('user_id').notNull().references(() => appUser.id, { onDelete: 'cascade' }),
+  hubCheckedAt: timestamptz('hub_checked_at').notNull().defaultNow(),
+  createdAt: createdAt(),
+  expiresAt: timestamptz('expires_at').notNull(),
+}, (t) => [index('user_session_user_idx').on(t.userId)]);
+
+/**
+ * A sign-in on its way through the hub: what the callback must check (state,
+ * nonce) and prove (the PKCE verifier), and where to go after. The browser
+ * holds only a random id for it, in a short-lived cookie; the row is taken
+ * (deleted) by the callback whatever happens, so it works once.
+ */
+export const hubLogin = foosballSchema.table('hub_login', {
+  idHash: bytea('id_hash').primaryKey(),
+  state: text('state').notNull(),
+  nonce: text('nonce').notNull(),
+  codeVerifier: text('code_verifier').notNull(),
+  /** A local path, checked before it is stored. */
+  next: text('next').notNull().default('/'),
+  /** A silent re-check (prompt=none) rather than a sign-in someone asked for. */
+  silent: boolean('silent').notNull().default(false),
+  expiresAt: timestamptz('expires_at').notNull(),
+});
+
+// ---------------------------------------------------------------- passkeys (before the login hub; unused, kept for a rollback)
 
 export const authCredential = foosballSchema.table('auth_credential', {
   id: text('id').primaryKey(), // base64url credential id

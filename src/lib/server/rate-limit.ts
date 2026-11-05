@@ -1,7 +1,7 @@
 /**
- * Fixed-window request limits for the public sign-in and invite endpoints: the
- * only routes anyone on the internet can reach, and ones that write to the
- * database (a challenge row per request). Guessing cannot get past a passkey;
+ * Fixed-window request limits for sign-ins through the login hub and invite
+ * joins: the routes anyone on the internet can reach, and ones that write to
+ * the database (a sign-in row per request). Guessing cannot get past the hub;
  * this caps floods. In memory: production runs a single replica.
  */
 export interface Limits {

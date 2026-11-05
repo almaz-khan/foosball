@@ -19,7 +19,7 @@ export type InvitePlayer = { playerId: number } | { firstName: string; lastName?
 
 export interface InviteInput {
   orgId: number;
-  /** The name a new account gets; prefilled on the invite page, where it can be changed. */
+  /** Who it is for, as the admins' list shows it; the account that joins keeps the name it has. */
   invitedName: string;
   role?: Role;
   player?: InvitePlayer;

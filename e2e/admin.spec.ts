@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { withPasskeys } from './passkeys.ts';
+import { HUB_PORT, hubSignsIn } from './hub.ts';
 
 test('an admin invites someone from the app; they join from another browser', async ({ page, browser }) => {
   await page.goto('/admin');
@@ -17,10 +17,10 @@ test('an admin invites someone from the app; they join from another browser', as
   // A clean browser: new contexts in a test inherit the project's options, Ann's session included.
   const hal = await browser.newContext({ storageState: { cookies: [], origins: [] } });
   const halPage = await hal.newPage();
-  await withPasskeys(hal, halPage);
+  await hubSignsIn('hal', 'Hal Ito');
   await halPage.goto(link);
   await expect(halPage.getByText('playing as Hal Ito')).toBeVisible();
-  await halPage.getByRole('button', { name: 'Create passkey and join' }).click();
+  await halPage.getByRole('button', { name: 'Join as Hal Ito' }).click();
   await expect(halPage).toHaveURL(/\/$/);
   await expect(halPage.getByRole('link', { name: 'Record a game' })).toBeVisible();
   await expect(halPage.getByRole('navigation', { name: 'Sections' }).getByRole('link', { name: 'Admin' })).toHaveCount(0);
@@ -34,12 +34,9 @@ test('an admin invites someone from the app; they join from another browser', as
   await expect(halRow).toContainText('plays as Hal Ito');
   await expect(page.locator('.rows li', { hasText: 'as Hal Ito ·' })).toHaveCount(0);
 
-  // Unlink him: he only watches now. Then a recovery link for him.
+  // Unlink him: he only watches now.
   await halRow.getByLabel('Player').selectOption({ label: '— none (watches) —' });
   await expect(halRow).toContainText('watches: no player');
-  await halRow.getByRole('button', { name: 'Recovery link' }).click();
-  await expect(page.getByText('A link that adds a passkey to Hal Ito’s account')).toBeVisible();
-  await expect(page.getByLabel('Link')).toHaveValue(/\/login\?enroll=/);
 
   // Ann can't demote herself while she is the only admin.
   const annRow = memberRow('Ann');
@@ -47,33 +44,11 @@ test('an admin invites someone from the app; they join from another browser', as
   await expect(page.getByRole('alert')).toContainText('at least one admin');
 });
 
-test('your account: name, passkeys, a link for another device', async ({ page, context }) => {
-  await withPasskeys(context, page);
+test('your account: name, and passkeys at the hub', async ({ page }) => {
   await page.goto('/');
   await page.locator('header').getByRole('link', { name: /Ann/ }).click();
   await expect(page).toHaveURL(/\/account$/);
-
-  // Her only passkey lives in the setup browser; it is this session's, and can't be removed alone.
-  const keys = page.locator('.rows').first().locator('li');
-  await expect(keys).toHaveCount(1);
-  await expect(keys.first()).toContainText('this browser');
-  await keys.first().getByRole('button', { name: 'Remove' }).click();
-  await page.getByRole('button', { name: 'Remove and sign out' }).click();
-  await expect(page.getByRole('alert')).toContainText('only passkey');
-
-  // A second passkey, here; renamed.
-  await page.getByRole('button', { name: 'Add a passkey' }).click();
-  await expect(keys).toHaveCount(2);
-  await keys.nth(1).getByRole('button', { name: 'Rename' }).click();
-  await page.getByLabel('Passkey name').fill('Work laptop');
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(keys.nth(1)).toContainText('Work laptop');
-
-  await page.getByRole('button', { name: 'Link for another device' }).click();
-  await expect(page.getByLabel('Link')).toHaveValue(/\/login\?enroll=/);
-
-  // Now the extra one can go.
-  await keys.nth(1).getByRole('button', { name: 'Remove' }).click();
-  await keys.nth(1).getByRole('button', { name: 'Remove', exact: true }).click();
-  await expect(keys).toHaveCount(1);
+  await expect(page.getByText('Ann', { exact: true })).toBeVisible();
+  // Passkeys are added and removed at the hub, shared by every app.
+  await expect(page.getByRole('link', { name: `localhost:${HUB_PORT}` })).toHaveAttribute('href', `http://localhost:${HUB_PORT}/`);
 });

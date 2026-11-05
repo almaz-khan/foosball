@@ -1,29 +1,23 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { ORG_COOKIE, orgCookie, webauthn } from '#lib/server/auth.ts';
+import { ORG_COOKIE, orgCookie, requireSession } from '#lib/server/auth.ts';
 import { acceptInvite, inviteFor, InviteError } from '#lib/server/invites.ts';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, locals, url }) => {
+/** Opened signed out, an invite goes through the hub first (hooks) and comes back here to join. */
+export const load: PageServerLoad = async ({ params, locals }) => {
+  const session = requireSession(locals);
   const invite = await inviteFor(params.token);
-  let wrongOrigin: string | null = null;
-  try {
-    const { origin } = webauthn();
-    if (origin !== url.origin) wrongOrigin = origin;
-  } catch {
-    // The sign-in page explains a misconfigured origin; here the link just can't be used.
-  }
   return {
     invite,
-    signedInAs: locals.session?.userName ?? null,
+    signedInAs: session.userName,
     alreadyMember: invite !== null && locals.memberships.some((m) => m.orgId === invite.orgId),
-    wrongOrigin,
   };
 };
 
 export const actions: Actions = {
-  /** Someone already signed in joins with the account they have: no new passkey. */
+  /** Joins with the account the hub signed them in to. */
   join: async ({ params, locals, cookies }) => {
-    if (!locals.session) return fail(401, { message: 'Sign in first, or create an account with this invite.' });
+    if (!locals.session) return fail(401, { message: 'Sign in first.' });
     const invite = await inviteFor(params.token);
     try {
       await acceptInvite(params.token, locals.session.userId);

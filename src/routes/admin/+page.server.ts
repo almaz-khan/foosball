@@ -1,16 +1,13 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { createEnrollment } from '#foosball/auth.ts';
 import { formatWhen } from '#lib/dates.ts';
-import { requireAdmin, requireSession, webauthn } from '#lib/server/auth.ts';
+import { requireAdmin, requireSession } from '#lib/server/auth.ts';
 import { ROLES, type Role } from '#lib/server/db/schema.ts';
 import { createInvite, InviteError, inviteHours, pendingInvites, revokeInvite, type InvitePlayer } from '#lib/server/invites.ts';
-import { canIssueRecovery, linkPlayer, listMembers, MemberError, removeMember, setRole } from '#lib/server/members.ts';
+import { linkPlayer, listMembers, MemberError, removeMember, setRole } from '#lib/server/members.ts';
 import { listPlayers } from '#lib/server/players.ts';
+import { appOrigin } from '#lib/server/hub.ts';
 import { UserError } from '#lib/server/users.ts';
 import type { Actions, PageServerLoad } from './$types';
-
-/** An admin's recovery link usually travels by chat: an hour, not the self-service fifteen minutes. */
-const RECOVERY_MINUTES = 60;
 
 export const load: PageServerLoad = async ({ locals }) => {
   const member = requireAdmin(locals);
@@ -74,7 +71,7 @@ export const actions: Actions = {
       return {
         invite: {
           name: invitedName.trim(),
-          link: `${webauthn().origin}/invite/${token}`,
+          link: `${appOrigin()}/invite/${token}`,
           expires: formatWhen(expiresAt, member.orgTimeZone),
         },
       };
@@ -122,27 +119,5 @@ export const actions: Actions = {
       if (userId === requireSession(locals).userId) redirect(303, '/');
       return { saved: true };
     });
-  },
-
-  /** A link that adds a passkey to a member's account: for a lost or new device. */
-  recoveryLink: async ({ locals, request }) => {
-    const member = requireAdmin(locals);
-    const userId = int((await request.formData()).get('user_id'));
-    const target = (await listMembers(member.orgId)).find((m) => m.userId === userId);
-    if (!target) return fail(404, { message: 'No such member.' });
-    if (!(await canIssueRecovery(requireSession(locals).userId, target.userId))) {
-      return fail(403, {
-        message: `${target.userName} is also in an org you don’t administer, so only an admin of every org they’re in can make this link.`,
-      });
-    }
-    const { token } = await createEnrollment(target.userId, undefined, RECOVERY_MINUTES);
-    return {
-      recovery: {
-        userId: target.userId,
-        name: target.userName,
-        link: `${webauthn().origin}/login?enroll=${token}`,
-        minutes: RECOVERY_MINUTES,
-      },
-    };
   },
 };

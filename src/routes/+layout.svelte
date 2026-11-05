@@ -24,7 +24,7 @@
 		<div class="bar-inner">
 			<a class="brand" href="/">{data.member?.orgName ?? 'Foosball'}</a>
 			<div class="who">
-				<a class="name" href="/account" title="Your account and passkeys">
+				<a class="name" href="/account" title="Your account">
 					{data.userName}{#if data.member?.role === 'admin'}<span class="tag">admin</span>{/if}
 				</a>
 				<form method="POST" action="/auth/logout">

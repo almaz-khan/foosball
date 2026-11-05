@@ -16,6 +16,7 @@
     "cli": "bun run src/cli.ts",
     "migrate": "bun run src/cli.ts migrate",
     "seed": "bun run src/cli.ts seed",
+    "fakehub": "bun run scripts/fakehub.ts",
     "db:up": "docker compose up -d --wait postgres",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
@@ -26,13 +27,12 @@
     "typecheck": "svelte-kit sync && tsc --noEmit"
   },
   "dependencies": {
-    "@simplewebauthn/server": "^14.0.3",
     "drizzle-orm": "^0.45.4",
+    "oauth4webapi": "3.8.8",
     "postgres": "^3.4.9"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
-    "@simplewebauthn/browser": "^14.0.0",
     "@sveltejs/adapter-node": "^6.0.1",
     "@sveltejs/kit": "^3.1.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",

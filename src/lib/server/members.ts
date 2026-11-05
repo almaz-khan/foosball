@@ -109,20 +109,3 @@ export async function removeMember(orgId: number, userId: number, db: Executor =
     return true;
   });
 }
-
-/**
- * Whether an admin may hand out a link that adds a passkey to someone's
- * account. That link opens the whole account, in every org it belongs to,
- * so it is only theirs to give if they are an admin wherever that person is
- * a member. Otherwise an admin of one org could take over a member of another.
- */
-export async function canIssueRecovery(adminUserId: number, targetUserId: number, db: Executor = getDb()): Promise<boolean> {
-  const theirs = await db.select({ orgId: orgMember.orgId }).from(orgMember).where(eq(orgMember.userId, targetUserId));
-  if (theirs.length === 0) return false;
-  const mine = await db
-    .select({ orgId: orgMember.orgId })
-    .from(orgMember)
-    .where(and(eq(orgMember.userId, adminUserId), eq(orgMember.role, 'admin')));
-  const adminOf = new Set(mine.map((m) => m.orgId));
-  return theirs.every((m) => adminOf.has(m.orgId));
-}

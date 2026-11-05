@@ -1,10 +1,9 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
 import { sql } from 'drizzle-orm';
-import { enrollmentFor, listPasskeys } from '../src/auth.ts';
 import type { Db } from '../src/lib/server/db/index.ts';
-import { appUser, authCredential, orgMember } from '../src/lib/server/db/schema.ts';
+import { appUser, orgMember } from '../src/lib/server/db/schema.ts';
 import { inviteFor, pendingInvites } from '../src/lib/server/invites.ts';
-import { canIssueRecovery, listMembers } from '../src/lib/server/members.ts';
+import { listMembers } from '../src/lib/server/members.ts';
 import { createOrg, memberships, type Membership, type Org } from '../src/lib/server/orgs.ts';
 import { createPlayer, type Player } from '../src/lib/server/players.ts';
 import { getUser } from '../src/lib/server/users.ts';
@@ -45,52 +44,14 @@ beforeEach(async () => {
   }
 });
 
-const as = (name: 'ann' | 'ben' | 'zed', options: { form?: Record<string, string>; credentialId?: string } = {}) => {
-  const e = event({ userId: who[name].id, member: who[name].member, form: options.form }) as {
-    locals: { session: { credentialId: string }; memberships: Membership[] };
-  };
-  if (options.credentialId) e.locals.session.credentialId = options.credentialId;
-  return e as never;
-};
-
-async function passkeys(userId: number, ...names: string[]) {
-  await db.insert(authCredential).values(
-    names.map((name) => ({ id: `${name}-${userId}`, userId, publicKey: Buffer.from('k'), name })),
-  );
-}
+const as = (name: 'ann' | 'ben' | 'zed', options: { form?: Record<string, string> } = {}) =>
+  event({ userId: who[name].id, member: who[name].member, form: options.form });
 
 describe('account', () => {
-  test('the last passkey cannot be removed; another can', async () => {
-    await passkeys(who.ben.id, 'mac');
-    const remove = (id: string) => outcome(() => account.actions.revokePasskey!(as('ben', { form: { id }, credentialId: 'other' })));
-    expect(await remove(`mac-${who.ben.id}`)).toMatchObject({ kind: 'fail', data: { passkeyError: expect.stringMatching(/only passkey/) } });
-    await passkeys(who.ben.id, 'phone');
-    expect(await remove(`mac-${who.ben.id}`)).toMatchObject({ kind: 'ok' });
-    expect((await listPasskeys(who.ben.id, db)).map((p) => p.name)).toEqual(['phone']);
-    // Someone else's passkey is not theirs to remove.
-    await passkeys(who.ann.id, 'x', 'y');
-    expect(await remove(`x-${who.ann.id}`)).toMatchObject({ kind: 'fail', status: 404 });
-  });
-
-  test('removing the passkey this browser signed in with signs it out', async () => {
-    await passkeys(who.ben.id, 'mac', 'phone');
-    const result = await outcome(() =>
-      account.actions.revokePasskey!(as('ben', { form: { id: `mac-${who.ben.id}` }, credentialId: `mac-${who.ben.id}` })),
-    );
-    expect(result).toMatchObject({ kind: 'redirect', location: '/login' });
-  });
-
   test('renaming yourself: free names only', async () => {
     expect(await outcome(() => account.actions.rename!(as('ben', { form: { name: 'Ann' } })))).toMatchObject({ kind: 'fail' });
     expect(await outcome(() => account.actions.rename!(as('ben', { form: { name: ' Benjamin ' } })))).toMatchObject({ kind: 'ok' });
     expect((await getUser(who.ben.id, db))!.name).toBe('Benjamin');
-  });
-
-  test('a link for another device adds a passkey to your own account', async () => {
-    const result = await outcome(() => account.actions.enrollLink!(as('ben')));
-    const link = (result as unknown as { value: { enrollLink: string } }).value.enrollLink;
-    expect(link).toMatch(/^https:\/\/foosball\.example\.dev\/login\?enroll=/);
-    expect((await enrollmentFor(new URL(link).searchParams.get('enroll')!, db))!.id).toBe(who.ben.id);
   });
 
   test('switching org: only to one you are in', async () => {
@@ -149,18 +110,5 @@ describe('admin', () => {
     expect(await remove(who.ann.id)).toMatchObject({ kind: 'fail' });
     expect(await remove(who.ben.id)).toMatchObject({ kind: 'ok' });
     expect((await listMembers(office.id, db)).map((m) => m.userName)).toEqual(['Ann', 'Zed']);
-  });
-
-  test('recovery links only for people whose every org is the admin’s', async () => {
-    expect(await canIssueRecovery(who.ann.id, who.ben.id, db)).toBe(true);
-    // Zed is also an admin of the pub, which Ann does not administer.
-    expect(await canIssueRecovery(who.ann.id, who.zed.id, db)).toBe(false);
-
-    const recover = (userId: number) => outcome(() => admin.actions.recoveryLink!(as('ann', { form: { user_id: String(userId) } })));
-    const ok = await recover(who.ben.id);
-    expect(ok).toMatchObject({ kind: 'ok', value: { recovery: { name: 'Ben', minutes: 60 } } });
-    const token = new URL((ok as unknown as { value: { recovery: { link: string } } }).value.recovery.link).searchParams.get('enroll')!;
-    expect((await enrollmentFor(token, db))!.id).toBe(who.ben.id);
-    expect(await recover(who.zed.id)).toMatchObject({ kind: 'fail', status: 403 });
   });
 });

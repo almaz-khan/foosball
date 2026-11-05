@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 import { pgSchema, serial } from 'drizzle-orm/pg-core';
-import { authConfig, createEnrollment, ENROLL_MINUTES, listPasskeys, revokePasskey } from './auth.ts';
 import { closeDb, createDb, getDb, migrate, MIGRATIONS, type Db } from './lib/server/db/index.ts';
 import { ROLES, type Role } from './lib/server/db/schema.ts';
 import { createGame } from './lib/server/games.ts';
+import { appOrigin } from './lib/server/hub.ts';
 import { createInvite, InviteError, inviteHours, pendingInvites, revokeInvite, type InvitePlayer } from './lib/server/invites.ts';
 import { linkPlayer, listMembers, MemberError, removeMember, setRole } from './lib/server/members.ts';
 import { createOrg, findOrg, listOrgs, OrgError, type Org } from './lib/server/orgs.ts';
@@ -35,12 +35,11 @@ const USAGE = `foosball — command line for the server
   foosball player list --org <s> [--all]   the roster, with ids (--all: archived too)
   foosball player add --org <s> <first> [last]
 
-  foosball auth enroll --user <name>       one-time link: another passkey for an account (recovery)
-  foosball auth list                       passkeys, with ids
-  foosball auth revoke <id>                remove a passkey and end its sessions
-
-  foosball user list                       accounts and their orgs
+  foosball user list                       accounts, their login hub person keys and orgs
   foosball user rename <old> <new>
+
+People sign in at the login hub (login.almaz.dev): their passkeys, and who may
+open Foosball at all, are managed in its admin UI.
 
 In production: railway ssh --service foosball -- bun run src/cli.ts <command>
 `;
@@ -58,7 +57,6 @@ async function main(argv: string[]): Promise<number> {
     case 'invite': return cmdInvite(flags, positional);
     case 'member': return cmdMember(flags, positional);
     case 'player': return cmdPlayer(flags, positional);
-    case 'auth': return cmdAuth(flags, positional);
     case 'user': return cmdUser(positional);
     case undefined:
     case '-h':
@@ -164,7 +162,7 @@ async function cmdInvite(flags: Flags, [sub, id]: string[]): Promise<number> {
       const hours = flags.hours ? positiveInt(flags.hours, '--hours') : inviteHours();
       const role: Role = 'admin' in flags ? 'admin' : 'member';
       const { token, expiresAt } = await createInvite({ orgId: org.id, invitedName: flags.name, role, player, hours });
-      const { origin } = authConfig();
+      const origin = appOrigin();
       console.log(`Invite for ${flags.name} to "${org.name}" as ${role}${player ? '' : ' (no player: can watch, not record)'}.`);
       console.log(`Send them this link; it works once:\n\n  ${origin}/invite/${token}\n`);
       console.log(`It expires ${expiresAt.toLocaleString()}.`);
@@ -257,49 +255,13 @@ async function cmdPlayer(flags: Flags, [sub, first, ...last]: string[]): Promise
 
 // ---------------------------------------------------------------- accounts
 
-async function cmdAuth(flags: Flags, [sub, arg]: string[]): Promise<number> {
-  switch (sub) {
-    case 'enroll': {
-      if (!flags.user) throw new Usage('foosball auth enroll --user <name>   (new accounts come from `invite create`)');
-      const user = await findUser(flags.user);
-      if (!user) throw new UserError(`no account "${flags.user}" — see \`foosball user list\``);
-      const { origin } = authConfig();
-      const { token, expiresAt } = await createEnrollment(user.id);
-      console.log(`This link adds a passkey to ${user.name}'s account.`);
-      console.log(`Open it in the browser that should get the passkey:\n\n  ${origin}/login?enroll=${token}\n`);
-      console.log(`It works once and expires at ${expiresAt.toLocaleTimeString()} (${ENROLL_MINUTES} minutes).`);
-      return 0;
-    }
-    case 'list': {
-      const keys = await listPasskeys(null);
-      if (keys.length === 0) console.log('no passkeys');
-      for (const k of keys) {
-        const used = k.lastUsedAt ? k.lastUsedAt.toISOString().slice(0, 10) : 'never';
-        console.log(`  ${k.id}  ${k.userName.padEnd(16)} ${k.name.padEnd(16)} added ${k.createdAt.toISOString().slice(0, 10)}  last used ${used}`);
-      }
-      return 0;
-    }
-    case 'revoke': {
-      if (!arg) throw new Usage('foosball auth revoke <id>   (ids from `auth list`)');
-      if (!(await revokePasskey(arg, null))) {
-        console.error(`no passkey with id ${arg}`);
-        return 1;
-      }
-      console.log('revoked; every session it opened is signed out');
-      return 0;
-    }
-    default:
-      throw new Usage('foosball auth enroll | list | revoke');
-  }
-}
-
 async function cmdUser([sub, from, to]: string[]): Promise<number> {
   switch (sub) {
     case 'list': {
       const users = await listUsers();
       if (users.length === 0) console.log('no accounts yet');
       for (const u of users) {
-        console.log(`  ${String(u.id).padStart(3)}  ${u.name.padEnd(20)} ${u.passkeys} passkey(s)   ${u.orgs.join(', ') || 'no org'}`);
+        console.log(`  ${String(u.id).padStart(3)}  ${u.name.padEnd(20)} ${(u.hubSub ?? '(not signed in yet)').padEnd(20)} ${u.orgs.join(', ') || 'no org'}`);
       }
       return 0;
     }

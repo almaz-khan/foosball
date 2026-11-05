@@ -55,8 +55,8 @@ jobs:
         run: bun test --timeout 20000
       - name: Production build
         run: bun run build
-      # The production build in Chromium, with passkeys from its virtual
-      # authenticator, against its own database on the same service.
+      # The production build in Chromium, signed in through a fake login hub
+      # (e2e/serve.ts), against its own database on the same service.
       - name: Install Chromium for the end-to-end tests
         run: bunx playwright install --with-deps chromium
       - name: End-to-end tests

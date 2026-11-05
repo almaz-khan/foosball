@@ -23,7 +23,7 @@ export function event(options: {
     params: options.params ?? {},
     request: new Request(url, options.form ? { method: 'POST', body } : undefined),
     locals: {
-      session: { userId: options.userId, userName: 'test', credentialId: 'test', expiresAt: new Date(), renewed: false },
+      session: { userId: options.userId, userName: 'test', expiresAt: new Date(), renewed: false, hubCheckDue: false },
       memberships: options.member ? [options.member] : [],
       member: options.member,
     },

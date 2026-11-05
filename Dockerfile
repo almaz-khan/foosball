@@ -1,6 +1,6 @@
 # Foosball: SvelteKit (adapter-node) served by Bun, with the CLI alongside it so
 # `railway ssh --service foosball -- bun run src/cli.ts ...` works in production
-# (migrations, orgs, invites, passkey recovery, the Mongo import).
+# (migrations, orgs, invites, members, the Mongo import).
 
 FROM oven/bun:1.3.14-slim AS build
 WORKDIR /app

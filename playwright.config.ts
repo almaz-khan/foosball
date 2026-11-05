@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * End-to-end: the production build in a real Chromium, with passkeys from
- * Chromium's virtual authenticator. `bun run e2e` builds first.
+ * End-to-end: the production build in a real Chromium, signed in through a
+ * fake login hub (see e2e/serve.ts). `bun run e2e` builds first.
  */
 const PORT = Number(process.env.E2E_PORT ?? 5182);
 
@@ -16,7 +16,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: {
     ...devices['Desktop Chrome'],
-    // Passkeys are bound to a hostname; localhost is the one browsers allow over http.
+    // The address the fake hub sends the browser back to (FOOSBALL_ORIGIN in e2e/serve.ts).
     baseURL: `http://localhost:${PORT}`,
     // Plain http to a production build: say so, as a proxy would (see e2e/serve.ts).
     extraHTTPHeaders: { 'x-forwarded-proto': 'http' },
